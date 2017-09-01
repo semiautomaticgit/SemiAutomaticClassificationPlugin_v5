@@ -112,7 +112,7 @@ class USGS_Spectral_Lib:
 				return cfg.tmpDir + "/" + dT + ".asc"
 			else:
 				raise ValueError('No')
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msgErr21()
@@ -131,7 +131,7 @@ class USGS_Spectral_Lib:
 				cfg.ui.USGS_library_textBrowser.setHtml(dHtml)
 			else:
 				raise ValueError('No')
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msgErr21()

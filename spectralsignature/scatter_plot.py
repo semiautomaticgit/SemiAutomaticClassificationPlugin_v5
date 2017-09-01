@@ -71,7 +71,7 @@ class Scatter_Plot:
 	
 	def motion_event(self, event):
 		if event.inaxes is not None:
-			cfg.uiscp.value_label_2.setText("x=" + string.ljust(str(event.xdata)[:8],8) + " y=" + string.ljust(str(event.ydata)[:8],8))
+			cfg.uiscp.value_label_2.setText("x=" + str(event.xdata)[:8].ljust(8) + " y=" + str(event.ydata)[:8].ljust(8) )
 	
 	def press_event(self, event):
 		if event.inaxes is None:
@@ -203,7 +203,7 @@ class Scatter_Plot:
 			cfg.uiUtls.removeProgressBar()
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " all signatures")
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.uiUtls.removeProgressBar()
@@ -346,7 +346,7 @@ class Scatter_Plot:
 		for b in range(0, r):
 			if tW.item(b, 0).checkState() == 2:
 				i = tW.item(b, 6).text()
-				if str(i) in cfg.ROI_SCP_UID.values():
+				if str(i) in list(cfg.ROI_SCP_UID.values()):
 					h = cfg.utls.calculateScatterPlot(cfg.shpLay, cfg.fldSCP_UID, str(i))
 					# add ROI to scatter plot table
 					cfg.scaPlT.sigListToScatterPlot(i, h, [cfg.scatterBandX, cfg.scatterBandY])
@@ -366,7 +366,7 @@ class Scatter_Plot:
 		v = list(set(iR))
 		if len(v) == 0:
 			count = tW.rowCount()
-			v = range(0, count)
+			v = list(range(0, count))
 		ids = []
 		for x in v:
 			ids.append(tW.item(x, 6).text())
@@ -384,8 +384,8 @@ class Scatter_Plot:
 		bX = cfg.scatterBandX
 		bY = cfg.scatterBandY
 		# Set labels
-		cfg.uiscp.Scatter_Widget_2.sigCanvas.ax.set_xlabel(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Band" + " " +  str(bX)))
-		cfg.uiscp.Scatter_Widget_2.sigCanvas.ax.set_ylabel(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Band" + " " + str(bY)))
+		cfg.uiscp.Scatter_Widget_2.sigCanvas.ax.set_xlabel(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Band" + " " +  str(bX)))
+		cfg.uiscp.Scatter_Widget_2.sigCanvas.ax.set_ylabel(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Band" + " " + str(bY)))
 		r = tW.rowCount()
 		xMins = []
 		xMaxs = []
@@ -481,7 +481,7 @@ class Scatter_Plot:
 	# remove scatter plot from list
 	def removeScatter(self):
 		# ask for confirm
-		a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Delete scatter plot"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to delete highlighted scatter plots?"))
+		a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Delete scatter plot"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to delete highlighted scatter plots?"))
 		if a == "Yes":
 			tW =cfg.uiscp.scatter_list_plot_tableWidget
 			r = []
@@ -543,7 +543,7 @@ class Scatter_Plot:
 		cfg.utls.insertTableColumn(l, 6, cfg.tableColString, 60, "Yes")
 		# add signature items
 		x = 0
-		for k in cfg.scatterPlotIDs.values():
+		for k in list(cfg.scatterPlotIDs.values()):
 			cfg.utls.insertTableRow(l, x, 20)
 			cfg.utls.addTableItem(l, "checkbox", x, 0, "Yes", None, cfg.scatterPlotList["CHECKBOX_" + str(k)])
 			cfg.utls.addTableItem(l, int(cfg.scatterPlotList["MACROCLASSID_" + str(k)]), x, 1)
@@ -576,7 +576,7 @@ class Scatter_Plot:
 		self.orderColumn = column
 		tW = cfg.uiscp.scatter_list_plot_tableWidget
 		count = tW.rowCount()
-		v = range(0, count)
+		v = list(range(0, count))
 		for x in v:
 			id = tW.item(x, 6).text()
 			cfg.scatterPlotList["ROW_" + str(id)] = x
@@ -591,7 +591,7 @@ class Scatter_Plot:
 			i = cfg.utls.selectLayerbyName(cfg.rstrNm, "Yes")
 			try:
 				b = i.bandCount()
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				b = 1
@@ -612,7 +612,7 @@ class Scatter_Plot:
 			i = cfg.utls.selectLayerbyName(cfg.rstrNm, "Yes")
 			try:
 				b = i.bandCount()
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				b = 1
@@ -674,7 +674,7 @@ class Scatter_Plot:
 			try:
 				# Draw the plot
 				cfg.uiscp.Scatter_Widget_2.sigCanvas.draw()
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				return "No"
@@ -690,7 +690,7 @@ class Scatter_Plot:
 			try:
 				# Draw the plot
 				cfg.uiscp.Scatter_Widget_2.sigCanvas.draw()
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				return "No"
@@ -774,7 +774,7 @@ class Scatter_Plot:
 		try:
 			oRB = oR.GetRasterBand(1)
 		# in case of errors
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			return "No"
@@ -835,7 +835,7 @@ class Scatter_Plot:
 				for b in range(0, r):
 					if tW.item(b, 0).checkState() == 2:
 						i = tW.item(b, 6).text()
-						if str(i) in cfg.ROI_SCP_UID.values():
+						if str(i) in list(cfg.ROI_SCP_UID.values()):
 							h = cfg.scatterPlotList["HISTOGRAM_" + str(i) + "_" + str([bX, bY])]
 						elif str(i) == cfg.sctrROIID:
 							h = cfg.sctrROIID_h["HISTOGRAM_" + str(i) + "_" + str([bX, bY])]
@@ -898,13 +898,13 @@ class Scatter_Plot:
 					g = cfg.utls.createGroup(cfg.grpNm)
 				preP = cfg.utls.selectLayerbyName(cfg.lastScattRaster)
 				if preP is not None:
-					cfg.lgnd.moveLayer(preP, g)
+					cfg.utls.moveLayer(preP, cfg.grpNm)
 				cfg.lastScattRaster = cfg.osSCP.path.basename(tPMD2)
-				r = cfg.iface.addRasterLayer(unicode(tPMD2), unicode(cfg.osSCP.path.basename(tPMD2)))
+				r = cfg.iface.addRasterLayer(str(tPMD2), str(cfg.osSCP.path.basename(tPMD2)))
 				cfg.utls.setRasterScatterSymbol(r, rasterSymbol)
 				cfg.utls.moveLayerTop(r)
-				cfg.lgnd.setGroupVisible(g, False)
-				cfg.lgnd.setGroupExpanded(g, False)
+				cfg.utls.setGroupVisible(g, False)
+				cfg.utls.setGroupExpanded(g, False)
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "")
 			return tPMD2
@@ -925,13 +925,13 @@ class Scatter_Plot:
 			
 	# save plot to file
 	def savePlot(self):
-		imgOut = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save plot to file"), "", "JPG file (*.jpg);;PNG file (*.png);;PDF file (*.pdf)")
+		imgOut = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save plot to file"), "", "JPG file (*.jpg);;PNG file (*.png);;PDF file (*.pdf)")
 		if len(imgOut) > 0:
-			if unicode(imgOut).endswith(".png"):
+			if str(imgOut).endswith(".png"):
 				cfg.uiscp.Scatter_Widget_2.sigCanvas.figure.savefig(imgOut, format="png", dpi=300)
-			elif unicode(imgOut).endswith(".pdf"):
+			elif str(imgOut).endswith(".pdf"):
 				cfg.uiscp.Scatter_Widget_2.sigCanvas.figure.savefig(imgOut, format="pdf", dpi=300)
-			elif unicode(imgOut).endswith(".jpg"):
+			elif str(imgOut).endswith(".jpg"):
 				cfg.uiscp.Scatter_Widget_2.sigCanvas.figure.savefig(imgOut, format="jpg", dpi=300, quality=90)
 			else:
 				imgOut = imgOut + ".jpg"
@@ -959,7 +959,7 @@ class Scatter_Plot:
 		try:
 			# Draw the plot
 			cfg.uiscp.Scatter_Widget_2.sigCanvas.draw()
-		except Exception, err:
+		except Exception as err:
 			cfg.mx.msgErr53()
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -967,7 +967,7 @@ class Scatter_Plot:
 			
 	# Change ROI color
 	def changePolygonColor(self):
-		c = cfg.QtGuiSCP.QColorDialog.getColor()
+		c = cfg.QtWidgetsSCP.QColorDialog.getColor()
 		if c.isValid():	
 			self.color = c.name()
 			cfg.uiscp.polygon_color_Button.setStyleSheet("background-color :" + self.color)

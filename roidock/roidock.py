@@ -156,8 +156,6 @@ class RoiDock:
 					self.clearCanvas()
 					return
 				g = QgsGeometry().fromPolygon([cfg.lastVrt])
-				# no intersection
-				mL.removePolygonIntersections(g)
 				mL.addTopologicalPoints(g)
 				pr = mL.dataProvider()
 				# create temp ROI
@@ -211,7 +209,7 @@ class RoiDock:
 		cfg.lstROI = cfg.lstROI2
 		try:
 			self.addHighlightPolygon(cfg.lstROI, 1)
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						
@@ -253,8 +251,8 @@ class RoiDock:
 			# temp files
 			tRN = cfg.subsTmpROI + dT + ".tif"
 			tSN = cfg.subsTmpROI + dT + ".shp"
-			tR = unicode(cfg.tmpDir + "//" + tRN)
-			tS = unicode(cfg.tmpDir + "//" + tSN)
+			tR = str(cfg.tmpDir + "//" + tRN)
+			tS = str(cfg.tmpDir + "//" + tSN)
 			# temp name
 			tN = cfg.subsTmpROI + dT
 			# crs
@@ -304,7 +302,7 @@ class RoiDock:
 							return pr
 						dBs["BANDS_" + str(b)] = tR
 						dBMA["BANDS_" + str(b)] = [cfg.bndSetMultiFactorsList[b], cfg.bndSetAddFactorsList[b]]
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						cfg.mx.msgErr7()
@@ -351,7 +349,7 @@ class RoiDock:
 						cfg.utls.getRasterBandByBandNumber(tR2, str(cfg.ROIband), tR,  "No", cfg.rasterDataType, [cfg.bndSetMultiFactorsList[int(cfg.ROIband) - 1], cfg.bndSetAddFactorsList[int(cfg.ROIband) - 1]]) # issue if using virtual raster option
 						dBs["BANDS_" + str(1)] = tR
 						dBMA["BANDS_" + str(1)] = [cfg.bndSetMultiFactorsList[0], cfg.bndSetAddFactorsList[0]]
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						cfg.pntROI = None
@@ -477,7 +475,7 @@ class RoiDock:
 			rX = rD.RasterXSize
 			# number of y pixels
 			rY = rD.RasterYSize
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			return "No"
@@ -544,7 +542,7 @@ class RoiDock:
 							r = self.regionGrowingAlg(aB, sPX, sPY, spectralRange, minimumSize)
 							if r is None:
 								return "No"
-						except Exception, err:
+						except Exception as err:
 							# logger
 							cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 							return "No"					
@@ -555,7 +553,7 @@ class RoiDock:
 								try:
 									rD = cfg.gdalSCP.Open(iR, cfg.gdalSCP.GA_ReadOnly)
 									iRB = rD.GetRasterBand(1)
-								except Exception, err:
+								except Exception as err:
 									# logger
 									cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 									return "No"
@@ -571,7 +569,7 @@ class RoiDock:
 										r = r * nR
 									else:
 										return "No"
-								except Exception, err:
+								except Exception as err:
 									# logger
 									cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 									return "No"
@@ -597,7 +595,7 @@ class RoiDock:
 						return "Yes"
 					else:
 						return "Out"
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					return "No"	
@@ -668,7 +666,7 @@ class RoiDock:
 			if cfg.show_ROI_radioButton.isChecked():
 				l = cfg.utls.selectLayerbyName(cfg.trnLay)
 				if l is not None:
-					cfg.lgnd.setLayerVisible(l, True)
+					cfg.utls.setLayerVisible(l, True)
 				cfg.utls.moveLayerTop(l)
 				cfg.rbbrBndPol.show()
 				# QGIS < 2.6
@@ -678,7 +676,7 @@ class RoiDock:
 			else:
 				l = cfg.utls.selectLayerbyName(cfg.trnLay)
 				if l is not None:
-					cfg.lgnd.setLayerVisible(l, False)
+					cfg.utls.setLayerVisible(l, False)
 				cfg.rbbrBndPol.hide()
 				# QGIS < 2.6
 				cfg.rbbrBndPolOut.hide()

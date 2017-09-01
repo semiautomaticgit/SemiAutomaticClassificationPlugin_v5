@@ -37,21 +37,26 @@ from qgis.gui import *
 cfg = __import__(str(__name__).split(".")[0] + ".core.config", fromlist=[''])
 
 class RegionROI(QgsMapTool):
+
+	ROIrightClicked = cfg.pyqtSignalSCP( ['QgsPoint'] )
+	ROIleftClicked = cfg.pyqtSignalSCP( ['QgsPoint'] )
+	moved = cfg.pyqtSignalSCP( ['QgsPoint'] )
+
 	def __init__(self, canvas):
 		QgsMapTool.__init__(self, canvas)
 		self.cnvs = canvas	
 		
 	def canvasMoveEvent(self, event):
 		point = self.cnvs.getCoordinateTransform().toMapCoordinates(event.pos())
-		self.emit(cfg.SIGNALSCP("moved"), point)
+		self.moved.emit(point)
 		
 	def canvasReleaseEvent(self, event):
 		pnt = self.cnvs.getCoordinateTransform().toMapCoordinates(event.pos())
 		# click
 		if(event.button() == cfg.QtSCP.RightButton):
-			self.emit(cfg.SIGNALSCP("ROIrightClicked"), pnt)
+			self.ROIrightClicked.emit(pnt)
 		else:
-			self.emit(cfg.SIGNALSCP("ROIleftClicked"), pnt)
+			self.ROIleftClicked.emit(pnt)
 			
 	def keyPressEvent(self, event):
 		if event.key()==(cfg.QtSCP.Key_Control):
