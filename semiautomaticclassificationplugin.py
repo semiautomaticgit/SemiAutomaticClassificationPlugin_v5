@@ -42,9 +42,8 @@ import datetime
 import subprocess
 import numpy as np
 import urllib
-import urllib2
 import ssl
-from cookielib import CookieJar
+from http.cookiejar import CookieJar
 import itertools
 import zipfile
 import tarfile
@@ -55,10 +54,10 @@ import xml.etree.cElementTree as ET
 from xml.dom import minidom
 import hashlib
 # Import the PyQt libraries
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import Qt, QObject, SIGNAL, QFileInfo, QSettings, QDir, QDate, QVariant
-from PyQt4.QtGui import QApplication
-from PyQt4.QtNetwork import QNetworkRequest
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt, QObject, QFileInfo, QSettings, QDir, QDate, QVariant, pyqtSignal
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtNetwork import QNetworkRequest
 # Import the QGIS libraries
 import qgis.core as qgisCore
 from qgis.gui import *
@@ -67,77 +66,85 @@ from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
 # Initialize Qt ui
-import ui.resources_rc
-from ui.ui_semiautomaticclassificationplugin import Ui_SemiAutomaticClassificationPlugin
-from ui.semiautomaticclassificationplugindialog import SemiAutomaticClassificationPluginDialog
-from ui.semiautomaticclassificationplugindialog import SpectralSignatureDialog
-from ui.semiautomaticclassificationplugindialog import ScatterPlotDialog
-from ui.semiautomaticclassificationplugindialog import DockClassDialog
+from .ui.resources_rc import *
+from .ui.ui_semiautomaticclassificationplugin import Ui_SemiAutomaticClassificationPlugin
+from .ui.semiautomaticclassificationplugindialog import SemiAutomaticClassificationPluginDialog
+from .ui.semiautomaticclassificationplugindialog import SpectralSignatureDialog
+from .ui.semiautomaticclassificationplugindialog import ScatterPlotDialog
+from .ui.semiautomaticclassificationplugindialog import DockClassDialog
 # Import plugin version
-from __init__ import version as semiautomaticclassVersion
+from .__init__ import version as semiautomaticclassVersion
+
 global PluginCheck
 PluginCheck = "Yes"
 try:
-	import core.config as cfg
+	from .core import config as cfg
 except:
 	PluginCheck = "No"
+	
+# required by other modules
+cfg.QObjectSCP = QObject
+cfg.pyqtSignalSCP = pyqtSignal
+
+
 if PluginCheck == "Yes":
 	try:
-		import core.messages as msgs
-		from core.utils import Utils
-		from core.signature_importer import Signature_Importer
-		from roidock.manualroi import ManualROI
-		from roidock.regionroi import RegionROI
-		from maininterface.downloadlandsatpointer import DownloadLandsatPointer
-		from maininterface.downloadasterpointer import DownloadASTERPointer
-		from maininterface.downloadmodispointer import DownloadMODISPointer
-		from maininterface.downloadsentinelpointer import DownloadSentinelPointer
-		from roidock.roidock import RoiDock
-		from spectralsignature.spectralsignatureplot import SpectralSignaturePlot
-		from spectralsignature.scatter_plot import Scatter_Plot
-		from classificationdock.classificationdock import ClassificationDock
-		from classificationdock.classificationpreview import ClassificationPreview
-		from maininterface.multipleroiTab import MultipleROITab
-		from spectralsignature.usgs_spectral_lib import USGS_Spectral_Lib
-		from maininterface.landsatTab import LandsatTab
-		from maininterface.asterTab import ASTERTab
-		from maininterface.modisTab import MODISTab
-		from maininterface.sentinelTab import Sentinel2Tab
-		from maininterface.accuracy import Accuracy
-		from maininterface.crossclassificationTab import CrossClassification
-		from maininterface.splitTab import SplitTab
-		from maininterface.pcaTab import PcaTab
-		from maininterface.vectortorasterTab import VectorToRasterTab
-		from maininterface.bandsetTab import BandsetTab
-		from maininterface.algorithmWeightTab import AlgWeightTab
-		from maininterface.signatureThresholdTab import SigThresholdTab
-		from maininterface.LCSignatureThresholdTab import LCSigThresholdTab
-		from maininterface.rgblistTab import RGBListTab
-		from maininterface.LCSignaturePixel import LCSigPixel
-		from maininterface.LCSignaturePixel2 import LCSigPixel2
-		from maininterface.bandcalcTab import BandCalcTab
-		from maininterface.batchTab import BatchTab
-		from maininterface.clipmultiplerasters import ClipMultipleRasters
-		from maininterface.stackrasterbands import StackRasterBands
-		from maininterface.editraster import EditRaster
-		from maininterface.sieveTab import SieveRaster
-		from maininterface.erosionTab import ErosionRaster
-		from maininterface.dilationTab import DilationRaster
-		from maininterface.downloadlandsatimages import DownloadLandsatImages
-		from maininterface.downloadasterimages import DownloadASTERImages
-		from maininterface.downloadmodisimages import DownloadMODISImages
-		from maininterface.downloadsentinelimages import DownloadSentinelImages
-		from maininterface.clipmultiplerasterspointer import ClipMultiplerastersPointer
-		from maininterface.landcoverchange import LandCoverChange
-		from maininterface.classreportTab import ClassReportTab
-		from maininterface.classtovectorTab import ClassToVectorTab
-		from maininterface.reclassificationTab import ReclassificationTab
-		from maininterface.settings import Settings
-		from core.input import Input
-		from ui.ui_utils import Ui_Utils
+		from .core.messages import Messages as msgs
+		from .core.utils import Utils
+		from .core.signature_importer import Signature_Importer
+		from .roidock.manualroi import ManualROI
+		from .roidock.regionroi import RegionROI
+		from .maininterface.downloadlandsatpointer import DownloadLandsatPointer
+		from .maininterface.downloadasterpointer import DownloadASTERPointer
+		from .maininterface.downloadmodispointer import DownloadMODISPointer
+		from .maininterface.downloadsentinelpointer import DownloadSentinelPointer
+		from .roidock.roidock import RoiDock
+		from .spectralsignature.spectralsignatureplot import SpectralSignaturePlot
+		from .spectralsignature.scatter_plot import Scatter_Plot
+		from .classificationdock.classificationdock import ClassificationDock
+		from .classificationdock.classificationpreview import ClassificationPreview
+		from .maininterface.multipleroiTab import MultipleROITab
+		from .spectralsignature.usgs_spectral_lib import USGS_Spectral_Lib
+		from .maininterface.landsatTab import LandsatTab
+		from .maininterface.asterTab import ASTERTab
+		from .maininterface.modisTab import MODISTab
+		from .maininterface.sentinelTab import Sentinel2Tab
+		from .maininterface.accuracy import Accuracy
+		from .maininterface.crossclassificationTab import CrossClassification
+		from .maininterface.splitTab import SplitTab
+		from .maininterface.pcaTab import PcaTab
+		from .maininterface.vectortorasterTab import VectorToRasterTab
+		from .maininterface.bandsetTab import BandsetTab
+		from .maininterface.algorithmWeightTab import AlgWeightTab
+		from .maininterface.signatureThresholdTab import SigThresholdTab
+		from .maininterface.LCSignatureThresholdTab import LCSigThresholdTab
+		from .maininterface.rgblistTab import RGBListTab
+		from .maininterface.LCSignaturePixel import LCSigPixel
+		from .maininterface.LCSignaturePixel2 import LCSigPixel2
+		from .maininterface.bandcalcTab import BandCalcTab
+		from .maininterface.batchTab import BatchTab
+		from .maininterface.clipmultiplerasters import ClipMultipleRasters
+		from .maininterface.stackrasterbands import StackRasterBands
+		from .maininterface.editraster import EditRaster
+		from .maininterface.sieveTab import SieveRaster
+		from .maininterface.erosionTab import ErosionRaster
+		from .maininterface.dilationTab import DilationRaster
+		from .maininterface.downloadlandsatimages import DownloadLandsatImages
+		from .maininterface.downloadasterimages import DownloadASTERImages
+		from .maininterface.downloadmodisimages import DownloadMODISImages
+		from .maininterface.downloadsentinelimages import DownloadSentinelImages
+		from .maininterface.clipmultiplerasterspointer import ClipMultiplerastersPointer
+		from .maininterface.landcoverchange import LandCoverChange
+		from .maininterface.classreportTab import ClassReportTab
+		from .maininterface.classtovectorTab import ClassToVectorTab
+		from .maininterface.reclassificationTab import ReclassificationTab
+		from .maininterface.settings import Settings
+		from .core.input import Input
+		from .ui.ui_utils import Ui_Utils
 	except:
 		PluginCheck = "No"
 		qgisUtils.iface.messageBar().pushMessage("Semi-Automatic Classification Plugin", QApplication.translate("semiautomaticclassificationplugin", "Please, restart QGIS for executing the Semi-Automatic Classification Plugin"), level=QgsMessageBar.INFO)
+
 	try:
 		import scipy.stats.distributions as statdistr
 		from scipy.spatial.distance import cdist
@@ -150,9 +157,10 @@ if PluginCheck == "Yes":
 		from matplotlib.ticker import MaxNLocator
 		import matplotlib.pyplot as mplplt
 		import matplotlib.colors as mplcolors
-	except Exception, err:
+	except Exception as err:
 		cfg.testMatplotlibV = err
-		
+
+	
 class SemiAutomaticClassificationPlugin:
 
 	def __init__(self, iface):
@@ -165,6 +173,7 @@ class SemiAutomaticClassificationPlugin:
 			cfg.timeSCP = time
 			cfg.datetimeSCP = datetime
 			cfg.subprocessSCP = subprocess
+			cfg.urllibSCP = urllib
 			cfg.itertoolsSCP = itertools
 			cfg.zipfileSCP = zipfile
 			cfg.tarfileSCP = tarfile
@@ -172,11 +181,10 @@ class SemiAutomaticClassificationPlugin:
 			cfg.randomSCP = random
 			cfg.QtCoreSCP = QtCore
 			cfg.QtGuiSCP = QtGui
+			cfg.QtWidgetsSCP = QtWidgets
 			cfg.QNetworkRequestSCP = QNetworkRequest
 			cfg.QtSCP = Qt
-			cfg.QObjectSCP = QObject
 			cfg.QVariantSCP = QVariant
-			cfg.SIGNALSCP= SIGNAL
 			cfg.QFileInfoSCP = QFileInfo
 			cfg.QSettingsSCP = QSettings
 			cfg.QDirSCP = QDir
@@ -185,8 +193,6 @@ class SemiAutomaticClassificationPlugin:
 			cfg.gdalSCP = gdal
 			cfg.ogrSCP = ogr
 			cfg.osrSCP = osr
-			cfg.urllibSCP = urllib
-			cfg.urllib2SCP = urllib2
 			cfg.sslSCP = ssl
 			cfg.CookieJarSCP = CookieJar
 			cfg.reSCP = re
@@ -209,8 +215,6 @@ class SemiAutomaticClassificationPlugin:
 			cfg.iface = iface
 			# reference to map canvas
 			cfg.cnvs = iface.mapCanvas()
-			# reference to legend
-			cfg.lgnd = iface.legendInterface()		
 			# create the dialog
 			cfg.dlg = SemiAutomaticClassificationPluginDialog()
 			# reference to ui
@@ -225,7 +229,7 @@ class SemiAutomaticClassificationPlugin:
 			# scatter plot dialog
 			cfg.scatterplotdlg = ScatterPlotDialog()
 			cfg.uiscp = cfg.scatterplotdlg.ui
-			cfg.mx = msgs.Messages(cfg.iface)
+			cfg.mx = msgs(cfg.iface)
 			cfg.utls = Utils()
 			cfg.ROId = RoiDock()
 			cfg.classD = ClassificationDock()
@@ -278,33 +282,33 @@ class SemiAutomaticClassificationPlugin:
 			cfg.uiUtls = Ui_Utils()
 			cfg.ipt = Input()
 			# connect when map is clicked
-			cfg.iface.connect(cfg.mnlROI , cfg.SIGNALSCP("leftClicked") , cfg.ROId.clckL)
-			cfg.iface.connect(cfg.mnlROI , cfg.SIGNALSCP("rightClicked") , cfg.ROId.clckR)
-			cfg.iface.connect(cfg.mnlROI , cfg.SIGNALSCP("moved") , cfg.ROId.movedPointer)
-			cfg.iface.connect(cfg.regionROI , cfg.SIGNALSCP("ROIleftClicked") , cfg.ROId.pointerClickROI)
-			cfg.iface.connect(cfg.regionROI , cfg.SIGNALSCP("ROIrightClicked") , cfg.ROId.pointerRightClickROI)
-			cfg.iface.connect(cfg.dwnlLandsatP , cfg.SIGNALSCP("leftClicked") , cfg.downLandsat.pointerLeftClick)
-			cfg.iface.connect(cfg.dwnlLandsatP , cfg.SIGNALSCP("rightClicked") , cfg.downLandsat.pointerRightClick)
-			cfg.iface.connect(cfg.dwnlASTERP , cfg.SIGNALSCP("leftClicked") , cfg.downASTER.pointerLeftClick)
-			cfg.iface.connect(cfg.dwnlASTERP , cfg.SIGNALSCP("rightClicked") , cfg.downASTER.pointerRightClick)
-			cfg.iface.connect(cfg.dwnlMODISP , cfg.SIGNALSCP("leftClicked") , cfg.downMODIS.pointerLeftClick)
-			cfg.iface.connect(cfg.dwnlMODISP , cfg.SIGNALSCP("rightClicked") , cfg.downMODIS.pointerRightClick)
-			cfg.iface.connect(cfg.dwnlSentinelP , cfg.SIGNALSCP("leftClicked") , cfg.downSentinel.pointerLeftClick)
-			cfg.iface.connect(cfg.dwnlSentinelP , cfg.SIGNALSCP("rightClicked") , cfg.downSentinel.pointerRightClick)
-			cfg.iface.connect(cfg.clipMultiP , cfg.SIGNALSCP("leftClicked") , cfg.clipMulti.pointerLeftClick)
-			cfg.iface.connect(cfg.clipMultiP , cfg.SIGNALSCP("rightClicked") , cfg.clipMulti.pointerRightClick)
-			cfg.iface.connect(cfg.regionROI , cfg.SIGNALSCP("moved") , cfg.ROId.movedPointer)
-			cfg.iface.connect(cfg.classPrev , cfg.SIGNALSCP("leftClicked") , cfg.classD.pointerClickPreview)
-			cfg.iface.connect(cfg.classPrev , cfg.SIGNALSCP("rightClicked") , cfg.classD.pointerRightClickPreview)
-			cfg.iface.connect(cfg.LCSPixel , cfg.SIGNALSCP("MaprightClicked") , cfg.LCSignT.pointerLeftClick)
-			cfg.iface.connect(cfg.LCSPixel , cfg.SIGNALSCP("MapleftClicked") , cfg.LCSignT.pointerLeftClick)
-			cfg.iface.connect(cfg.LCSPixel2 , cfg.SIGNALSCP("MaprightClicked") , cfg.spSigPlot.pointerLeftClick)
-			cfg.iface.connect(cfg.LCSPixel2 , cfg.SIGNALSCP("MapleftClicked") , cfg.spSigPlot.pointerLeftClick)
+			cfg.mnlROI.rightClicked.connect(cfg.ROId.clckR)
+			cfg.mnlROI.leftClicked.connect(cfg.ROId.clckL)
+			cfg.mnlROI.moved.connect(cfg.ROId.movedPointer)
+			cfg.regionROI.ROIleftClicked.connect(cfg.ROId.pointerClickROI)
+			cfg.regionROI.ROIrightClicked.connect(cfg.ROId.pointerRightClickROI)
+			cfg.regionROI.moved.connect(cfg.ROId.movedPointer)
+			cfg.clipMultiP.leftClicked.connect(cfg.clipMulti.pointerLeftClick)
+			cfg.clipMultiP.rightClicked.connect(cfg.clipMulti.pointerRightClick)
+			cfg.dwnlLandsatP.leftClicked.connect(cfg.downLandsat.pointerLeftClick)
+			cfg.dwnlLandsatP.rightClicked.connect(cfg.downLandsat.pointerRightClick)
+			cfg.dwnlASTERP.leftClicked.connect(cfg.downASTER.pointerLeftClick)
+			cfg.dwnlASTERP.rightClicked.connect(cfg.downASTER.pointerRightClick)
+			cfg.dwnlMODISP.leftClicked.connect(cfg.downMODIS.pointerLeftClick)
+			cfg.dwnlMODISP.rightClicked.connect(cfg.downMODIS.pointerRightClick)
+			cfg.dwnlSentinelP.leftClicked.connect(cfg.downSentinel.pointerLeftClick)
+			cfg.dwnlSentinelP.rightClicked.connect(cfg.downSentinel.pointerRightClick)
+			cfg.classPrev.leftClicked.connect(cfg.classD.pointerClickPreview)
+			cfg.classPrev.rightClicked.connect(cfg.classD.pointerRightClickPreview)
+			cfg.LCSPixel.MaprightClicked.connect(cfg.LCSignT.pointerLeftClick)
+			cfg.LCSPixel.MapleftClicked.connect(cfg.LCSignT.pointerLeftClick)
+			cfg.LCSPixel2.MaprightClicked.connect(cfg.spSigPlot.pointerLeftClick)
+			cfg.LCSPixel2.MapleftClicked.connect(cfg.spSigPlot.pointerLeftClick)			
 			# system variables
 			cfg.utls.findSystemSpecs()
 			cfg.utls.readVariables()
 			# initialize plugin directory
-			cfg.plgnDir = cfg.QFileInfoSCP(cfg.qgisCoreSCP.QgsApplication.qgisUserDbFilePath()).path() + "/python/plugins/" + str(__name__).split(".")[0]
+			cfg.plgnDir = cfg.QFileInfoSCP(cfg.qgisCoreSCP.QgsApplication.qgisUserDatabaseFilePath()).path() + "/python/plugins/" + str(__name__).split(".")[0]
 			# initialize LOG directory
 			cfg.lgndir = cfg.plgnDir
 			# log file path
@@ -321,7 +325,6 @@ class SemiAutomaticClassificationPlugin:
 				lclPth = cfg.plgnDir + "/i18n/semiautomaticclassificationplugin_" + lclNm + ".qm" 
 			if cfg.QFileInfoSCP(lclPth).exists(): 
 				trnsltr = cfg.QtCoreSCP.QTranslator() 
-				cfg.QtCoreSCP.QTextCodec.setCodecForTr(cfg.QtCoreSCP.QTextCodec.codecForName('utf-8'))
 				trnsltr.load(lclPth) 
 				if cfg.QtCoreSCP.qVersion() > '4.3.3': 
 					cfg.QtCoreSCP.QCoreApplication.installTranslator(trnsltr)
@@ -332,7 +335,7 @@ class SemiAutomaticClassificationPlugin:
 				cfg.gdalSCP.SetConfigOption('GDAL_NUM_THREADS', 'ALL_CPUS')
 			except:
 				pass
-			
+
 	# read registry keys 
 	def registryKeys(self):
 		""" registry keys """
@@ -429,11 +432,11 @@ class SemiAutomaticClassificationPlugin:
 			cfg.ui.tableWidget_weight.verticalHeader().setDefaultSectionSize(16)
 			cfg.ui.point_tableWidget.verticalHeader().setDefaultSectionSize(16)
 			try:
-				cfg.uidc.signature_list_tableWidget.horizontalHeader().setResizeMode(4, cfg.QtGuiSCP.QHeaderView.Stretch)
+				cfg.uidc.signature_list_tableWidget.horizontalHeader().setSectionResizeMode(4, cfg.QtWidgetsSCP.QHeaderView.Stretch)
 			except:
 				pass
 			try:
-				cfg.uidc.macroclass_color_tableWidget.horizontalHeader().setResizeMode(1, cfg.QtGuiSCP.QHeaderView.Stretch)
+				cfg.uidc.macroclass_color_tableWidget.horizontalHeader().setSectionResizeMode(1, cfg.QtWidgetsSCP.QHeaderView.Stretch)
 			except:
 				pass
 			# spectral signature plot list
@@ -441,30 +444,30 @@ class SemiAutomaticClassificationPlugin:
 			cfg.utls.sortTableColumn(cfg.uisp.signature_list_plot_tableWidget, 3)
 			cfg.utls.setColumnWidthList(cfg.uisp.signature_list_plot_tableWidget, [[0, 30], [1, 40], [2, 100], [3, 40], [4, 100], [5, 30]])
 			try:
-				cfg.uisp.signature_list_plot_tableWidget.horizontalHeader().setResizeMode(2, cfg.QtGuiSCP.QHeaderView.Stretch)
-				cfg.uisp.signature_list_plot_tableWidget.horizontalHeader().setResizeMode(4, cfg.QtGuiSCP.QHeaderView.Stretch)
+				cfg.uisp.signature_list_plot_tableWidget.horizontalHeader().setSectionResizeMode(2, cfg.QtWidgetsSCP.QHeaderView.Stretch)
+				cfg.uisp.signature_list_plot_tableWidget.horizontalHeader().setSectionResizeMode(4, cfg.QtWidgetsSCP.QHeaderView.Stretch)
 			except:
 				pass
 			# passwords
-			cfg.ui.password_usgs_lineEdit.setEchoMode(cfg.QtGuiSCP.QLineEdit.Password)
-			cfg.ui.password_usgs_lineEdit_2.setEchoMode(cfg.QtGuiSCP.QLineEdit.Password)
-			cfg.ui.password_usgs_lineEdit_3.setEchoMode(cfg.QtGuiSCP.QLineEdit.Password)
-			cfg.ui.password_scihub_lineEdit.setEchoMode(cfg.QtGuiSCP.QLineEdit.Password)
+			cfg.ui.password_usgs_lineEdit.setEchoMode(cfg.QtWidgetsSCP.QLineEdit.Password)
+			cfg.ui.password_usgs_lineEdit_2.setEchoMode(cfg.QtWidgetsSCP.QLineEdit.Password)
+			cfg.ui.password_usgs_lineEdit_3.setEchoMode(cfg.QtWidgetsSCP.QLineEdit.Password)
+			cfg.ui.password_scihub_lineEdit.setEchoMode(cfg.QtWidgetsSCP.QLineEdit.Password)
 			# scatter plot list
 			cfg.utls.insertTableColumn(cfg.uiscp.scatter_list_plot_tableWidget, 6, cfg.tableColString, None, "Yes")
 			cfg.utls.sortTableColumn(cfg.uiscp.scatter_list_plot_tableWidget, 3)
 			cfg.utls.setColumnWidthList(cfg.uiscp.scatter_list_plot_tableWidget, [[0, 30], [1, 40], [2, 100], [3, 40], [4, 100], [5, 30]])
 			try:
-				cfg.uiscp.scatter_list_plot_tableWidget.horizontalHeader().setResizeMode(2, cfg.QtGuiSCP.QHeaderView.Stretch)
-				cfg.uiscp.scatter_list_plot_tableWidget.horizontalHeader().setResizeMode(4, cfg.QtGuiSCP.QHeaderView.Stretch)
+				cfg.uiscp.scatter_list_plot_tableWidget.horizontalHeader().setSectionResizeMode(2, cfg.QtWidgetsSCP.QHeaderView.Stretch)
+				cfg.uiscp.scatter_list_plot_tableWidget.horizontalHeader().setSectionResizeMode(4, cfg.QtWidgetsSCP.QHeaderView.Stretch)
 			except:
 				pass
 			# signature threshold
 			cfg.utls.insertTableColumn(cfg.ui.signature_threshold_tableWidget, 7, cfg.tableColString, None, "Yes")
 			cfg.utls.setColumnWidthList(cfg.ui.signature_threshold_tableWidget,  [[4, 100], [5, 100], [6, 100]])
 			try:
-				cfg.ui.signature_threshold_tableWidget.horizontalHeader().setResizeMode(1, cfg.QtGuiSCP.QHeaderView.Stretch)
-				cfg.ui.signature_threshold_tableWidget.horizontalHeader().setResizeMode(3, cfg.QtGuiSCP.QHeaderView.Stretch)
+				cfg.ui.signature_threshold_tableWidget.horizontalHeader().setSectionResizeMode(1, cfg.QtWidgetsSCP.QHeaderView.Stretch)
+				cfg.ui.signature_threshold_tableWidget.horizontalHeader().setSectionResizeMode(3, cfg.QtWidgetsSCP.QHeaderView.Stretch)
 			except:
 				pass
 			# band set list
@@ -527,12 +530,12 @@ class SemiAutomaticClassificationPlugin:
 			elif cfg.soundVal == "No":
 				cfg.ui.sound_checkBox.setCheckState(0)
 			# connect to project loaded
-			cfg.QObjectSCP.connect(cfg.qgisCoreSCP.QgsProject.instance(), cfg.SIGNALSCP("readProject(const QDomDocument &)"), self.projectLoaded)
-			cfg.QObjectSCP.connect(cfg.qgisCoreSCP.QgsProject.instance(), cfg.SIGNALSCP("projectSaved()"), self.projectSaved)
+			cfg.qgisCoreSCP.QgsProject.instance().readProject.connect(self.projectLoaded)
+			cfg.qgisCoreSCP.QgsProject.instance().projectSaved.connect(self.projectSaved)
 			cfg.iface.newProjectCreated.connect(self.newProjectLoaded)
-			#cfg.QObjectSCP.connect(cfg.qgisCoreSCP.QgsProject.instance(), cfg.SIGNALSCP("loadingLayer(const QString &)"), self.test)
 			#cfg.qgisCoreSCP.QgsProject.instance().readMapLayer.connect(self.test)
 			#cfg.qgisCoreSCP.QgsProject.instance().layerLoaded.connect(self.test)
+			
 			""" Docks """
 			# reload layers in combos
 			cfg.ipt.refreshRasterLayer()
@@ -570,20 +573,24 @@ class SemiAutomaticClassificationPlugin:
 				cfg.ui.group_name_lineEdit.setText(cfg.grpNm)
 				# set USGS user and password
 				cfg.ui.user_usgs_lineEdit.setText(cfg.USGSUser)
-				USGSPsw = cfg.utls.decryptPassword(cfg.USGSPass)
-				cfg.ui.password_usgs_lineEdit.setText(USGSPsw)
+				if cfg.USGSPass is not None:
+					USGSPsw = cfg.utls.decryptPassword(cfg.USGSPass[2:-1])
+					cfg.ui.password_usgs_lineEdit.setText(str(USGSPsw)[2:-1])
 				cfg.ui.user_usgs_lineEdit_2.setText(cfg.USGSUserASTER)
 				cfg.ui.user_usgs_lineEdit_3.setText(cfg.USGSUserMODIS)
-				USGSPsw2 = cfg.utls.decryptPassword(cfg.USGSPassASTER)
-				cfg.ui.password_usgs_lineEdit_2.setText(USGSPsw2)
-				USGSPsw3 = cfg.utls.decryptPassword(cfg.USGSPassMODIS)
-				cfg.ui.password_usgs_lineEdit_3.setText(USGSPsw3)
+				if cfg.USGSPassASTER is not None:
+					USGSPsw2 = cfg.utls.decryptPassword(cfg.USGSPassASTER[2:-1])
+					cfg.ui.password_usgs_lineEdit_2.setText(str(USGSPsw2)[2:-1])
+				if cfg.USGSPassMODIS is not None:
+					USGSPsw3 = cfg.utls.decryptPassword(cfg.USGSPassMODIS[2:-1])
+					cfg.ui.password_usgs_lineEdit_3.setText(str(USGSPsw3)[2:-1])
 				# set SciHub user and password
 				cfg.ui.sentinel_service_lineEdit.setText(cfg.SciHubService)
 				cfg.ui.user_scihub_lineEdit.setText(cfg.SciHubUser)
-				sciHubPsw = cfg.utls.decryptPassword(cfg.SciHubPass)
-				cfg.ui.password_scihub_lineEdit.setText(sciHubPsw)
-			except Exception, err:
+				if cfg.SciHubPass is not None:
+					sciHubPsw = cfg.utls.decryptPassword(cfg.SciHubPass[2:-1])
+					cfg.ui.password_scihub_lineEdit.setText(str(sciHubPsw)[2:-1])
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			# reload layers in combos
@@ -1291,7 +1298,7 @@ class SemiAutomaticClassificationPlugin:
 		cfg.uidc.ROI_Macroclass_line.setText("MC 1")
 		try:
 			cfg.uidc.custom_index_lineEdit.setText("")
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		# RGB list
@@ -1446,7 +1453,7 @@ class SemiAutomaticClassificationPlugin:
 				idU = cfg.ui.unit_combo.findText(bSU)
 				cfg.ui.unit_combo.setCurrentIndex(idU)
 				t.blockSignals(False)
-			except Exception, err:
+			except Exception as err:
 				t = cfg.ui.tableWidget
 				t.blockSignals(False)
 				# logger
@@ -1462,6 +1469,7 @@ class SemiAutomaticClassificationPlugin:
 		cfg.classD.openInput()
 		# RGB list
 		cfg.RGBLT.RGBListTable(cfg.RGBList)
+
 		
 	# run
 	def run(self):
@@ -1490,7 +1498,9 @@ class SemiAutomaticClassificationPlugin:
 			# remove temp files
 			if cfg.tmpDir is not None and cfg.QDirSCP(cfg.tmpDir).exists():
 				cfg.shutilSCP.rmtree(cfg.tmpDir, True)
-			oDir = cfg.utls.makeDirectory(unicode(cfg.QDirSCP.tempPath() + "/" + cfg.tempDirName))
+			oDir = cfg.utls.makeDirectory(str(cfg.QDirSCP.tempPath() + "/" + cfg.tempDirName))
 		except:
 			if PluginCheck == "Yes":
 				qgisUtils.iface.messageBar().pushMessage("Semi-Automatic Classification Plugin", QApplication.translate("semiautomaticclassificationplugin", "Please, restart QGIS for executing the Semi-Automatic Classification Plugin"), level=QgsMessageBar.INFO)
+
+		

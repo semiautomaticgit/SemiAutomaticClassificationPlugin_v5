@@ -42,7 +42,7 @@ def description():
 
 
 def version():
-    return "Version 5.3.8 - Kourou"
+    return "Version 5.99.1 - Kourou"
 
 
 def icon():
@@ -50,7 +50,7 @@ def icon():
 
 
 def qgisMinimumVersion():
-    return "2.0"
+    return "2.99"
 
 def author():
     return "Luca Congedo"
@@ -62,7 +62,7 @@ def category():
     return "Raster"
 
 def classFactory(iface):
-    from semiautomaticclassificationplugin import SemiAutomaticClassificationPlugin
+    from .semiautomaticclassificationplugin import SemiAutomaticClassificationPlugin
     return SemiAutomaticClassificationPlugin(iface)
 
 def homepage():

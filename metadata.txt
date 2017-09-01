@@ -1,9 +1,9 @@
 [general]
 name=Semi-Automatic Classification Plugin
-qgisMinimumVersion=2.0
+qgisMinimumVersion=2.99
 description= Plugin that allows for the supervised classification of remote sensing images, providing tools for the download, the preprocessing and postprocessing of images.
-version=5.3.8
-about=Developed by Luca Congedo, the Semi-Automatic Classification Plugin (SCP) allows for the supervised classification of remote sensing images, providing tools for the download, the preprocessing and postprocessing of images. Search and download is available for ASTER, Landsat, MODIS, and Sentinel-2 images. Several algorithms are available for the land cover classification. This plugin requires the installation of GDAL, OGR, Numpy, SciPy, and Matplotlib. For more information please visit https://fromgistors.blogspot.com/ .
+version=5.99.1
+about=Developed by Luca Congedo, the Semi-Automatic Classification Plugin (SCP) allows for the supervised classification of remote sensing images, providing tools for the download, the preprocessing and postprocessing of images. Search and download is available for ASTER, Landsat, MODIS, and Sentinel-2 images. Several algorithms are available for the land cover classification. This plugin requires the installation of GDAL, OGR, Numpy, SciPy, and Matplotlib. For more information please visit https://fromgistors.blogspot.com/ . Keywords: Land Cover Supervised classification 土地被覆分類 监督分类 土地覆盖分类 教師付き分類 تصنيف استخدام الأراضي Classificação da Cobertura do Solo Clasificación de la Cobertura de la Tierra Classification de la Couverture du Sol классификация землепользования Klassifizierung der Landbedeckung Classificazione della Copertura del Suolo.
 
 author=Luca Congedo
 email=ing.congedoluca@gmail.com
@@ -14,13 +14,9 @@ icon=semiautomaticclassificationplugin.png
 ; start of optional metadata
 changelog=
 
-	5.3.8
-	Minor update:
-	-fixed Sentinel-2 search
-	
-	5.3.7
-	Minor update:
-	-fixed Sentinel-2 image preview url
+	5.99.1
+	Major update:
+	-version updated for QGIS 3
 	
 	5.3.6
 	Minor update:
@@ -239,7 +235,7 @@ changelog=
 	-added button for calculation of spectral distances
 	-clip multiple rasters using shapefile and accuracy assessment now work also if shapefile and raster projections are different
 
-experimental=False
+experimental=True
 deprecated=False
 
 tags = Raster, Classification, Land Cover, Remote Sensing, Analysis, Landsat, Sentinel, Supervised classification, Spectral signature, Mask, Clip, Accuracy, Landscape
