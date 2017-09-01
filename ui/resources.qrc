@@ -106,6 +106,7 @@
     <file>icons/semiautomaticclassificationplugin_settings_tool.png</file>
     <file>icons/semiautomaticclassificationplugin_sign_tool.png</file>
   </qresource>
+  <qresource prefix="other"/>
   <qresource prefix="pointer">
     <file>icons/pointer/LCS_pointer.png</file>
     <file>icons/pointer/ROI_pointer.png</file>

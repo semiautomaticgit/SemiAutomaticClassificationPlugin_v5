@@ -53,13 +53,13 @@ class Ui_Utils:
 	# Create a progress bar and a cancel button
 	def createProgressBar(self, message = "", action = "Executing"):
 		self.widgetBar = cfg.iface.messageBar().createMessage(action, message)
-		cfg.progressBar = cfg.QtGuiSCP.QProgressBar()
+		cfg.progressBar = cfg.QtWidgetsSCP.QProgressBar()
 		cfg.progressBar.setMinimum(0)
 		cfg.progressBar.setMaximum(100)
 		cfg.progressBar.setProperty("value", 0)
 		cfg.progressBar.setTextVisible(True)
 		cfg.progressBar.setObjectName("progressBar")
-		self.cancelButton = cfg.QtGuiSCP.QPushButton()
+		self.cancelButton = cfg.QtWidgetsSCP.QPushButton()
 		self.cancelButton.setEnabled(True)
 		self.cancelButton.setObjectName("cancelButton")
 		self.cancelButton.setText("Cancel")       
