@@ -43,20 +43,20 @@ class Sentinel2Tab:
 		
 	# Sentinel-2 input
 	def inputSentinel(self):
-		i = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
-		cfg.ui.S2_label_86.setText(unicode(i))
+		i = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
+		cfg.ui.S2_label_86.setText(str(i))
 		self.populateTable(i)
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(i))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(i))
 		
 	# XML input MTD_SAFL1C
 	def inputXML2(self):
-		m = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a XML file"), "", "XML file .xml (*.xml)")
-		cfg.ui.S2_label_94.setText(unicode(m))
+		m = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a XML file"), "", "XML file .xml (*.xml)")
+		cfg.ui.S2_label_94.setText(str(m))
 		if len(cfg.ui.S2_label_86.text()) > 0:
 			self.populateTable(cfg.ui.S2_label_86.text())
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(m))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(m))
 			
 	# populate table
 	def populateTable(self, input, batch = "No"):
@@ -100,9 +100,9 @@ class Sentinel2Tab:
 				quantVal = QUANTIFICATION_VALUE.firstChild.data
 				SOLAR_IRRADIANCE = doc2.getElementsByTagName("SOLAR_IRRADIANCE")
 				dEsunB = {"ESUN_BAND01": SOLAR_IRRADIANCE[0].firstChild.data, "ESUN_BAND02": SOLAR_IRRADIANCE[1].firstChild.data, "ESUN_BAND03": SOLAR_IRRADIANCE[2].firstChild.data, "ESUN_BAND04": SOLAR_IRRADIANCE[3].firstChild.data, "ESUN_BAND05": SOLAR_IRRADIANCE[4].firstChild.data, "ESUN_BAND06": SOLAR_IRRADIANCE[5].firstChild.data, "ESUN_BAND07": SOLAR_IRRADIANCE[6].firstChild.data, "ESUN_BAND08": SOLAR_IRRADIANCE[7].firstChild.data, "ESUN_BAND8A": SOLAR_IRRADIANCE[8].firstChild.data, "ESUN_BAND09": SOLAR_IRRADIANCE[9].firstChild.data, "ESUN_BAND10": SOLAR_IRRADIANCE[10].firstChild.data, "ESUN_BAND11": SOLAR_IRRADIANCE[11].firstChild.data, "ESUN_BAND12": SOLAR_IRRADIANCE[12].firstChild.data}
-			except Exception, err:
+			except Exception as err:
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				if batch == "No":
 					cfg.uiUtls.removeProgressBar()
 				cfg.mx.msgWar21()
@@ -157,13 +157,13 @@ class Sentinel2Tab:
 		if len(cfg.ui.S2_label_86.text()) == 0:
 			cfg.mx.msg14()
 		else:
-			o = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
+			o = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
 			if len(o) == 0:
 				cfg.mx.msg14()
 			else:
 				self.sentinel2(cfg.ui.S2_label_86.text(), o)
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "Perform sentinel-2 conversion: " + unicode(cfg.ui.S2_label_86.text()))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "Perform sentinel-2 conversion: " + str(cfg.ui.S2_label_86.text()))
 		
 	# sentinel-2 conversion
 	def sentinel2(self, inputDirectory, outputDirectory, batch = "No"):
@@ -247,7 +247,7 @@ class Sentinel2Tab:
 					cfg.iface.addRasterLayer(outR)
 				else:
 					cfg.mx.msgErr38(outR)
-					cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "WARNING: unable to load raster" + unicode(outR))
+					cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "WARNING: unable to load raster" + str(outR))
 			# create band set
 			if cfg.ui.S2_create_bandset_checkBox.isChecked() is True:
 				if str(sat).lower() in ['sentinel_2a', 'sentinel-2a', 'sentinel_2b', 'sentinel-2b']:
@@ -321,20 +321,20 @@ class Sentinel2Tab:
 			# reclassification <0 and >1
 			self.reclassRaster0min1max(tPMD, tempRaster)
 			cfg.utls.GDALCopyRaster(tempRaster, outputRaster, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1", resample)
-		except Exception, err:
+		except Exception as err:
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			return "No"
 		try:
 			cfg.osSCP.remove(tPMD)
 			cfg.osSCP.remove(tempRaster)
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "files deleted")
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(inputRaster))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(inputRaster))
 		return "Yes"
 			
 	# raster reclassification <0 and >1
@@ -355,5 +355,5 @@ class Sentinel2Tab:
 			bL[b] = None
 		rD = None
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(inputRaster))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(inputRaster))
 						

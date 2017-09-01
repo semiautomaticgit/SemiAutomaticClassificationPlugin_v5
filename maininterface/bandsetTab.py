@@ -156,7 +156,7 @@ class BandsetTab:
 	def addFileToBandSet(self, batch = "No", fileListString = None, wavelengthString = None, multiplicativeFactorString = None, additiveFactorString = None):
 		tW = cfg.ui.tableWidget
 		if batch == "No":
-			files = cfg.utls.getOpenFileNames(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a raster"), "", "Raster (*.*)")
+			files = cfg.utls.getOpenFileNames(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a raster"), "", "Raster (*.*)")
 		else:
 			cfg.utls.clearTable(tW)
 			fileList = fileListString.split(",")
@@ -182,7 +182,7 @@ class BandsetTab:
 		if len(files) == 1:
 			try:
 				iBC = cfg.utls.getNumberBandRaster(files[0])
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				cfg.mx.msgErr25()
@@ -190,11 +190,13 @@ class BandsetTab:
 			if iBC > 1:
 				r = cfg.utls.addRasterLayer(files[0], cfg.osSCP.path.basename(files[0]))
 				cfg.utls.clearTable(tW)
+				cfg.QtWidgetsSCP.qApp.processEvents()
 				cfg.ipt.checkRefreshRasterLayer()
 				# load project image name in combo
 				id = cfg.uidc.raster_name_combo.findText(cfg.osSCP.path.basename(files[0]))
 				cfg.uidc.raster_name_combo.setCurrentIndex(id)
 				return "Yes"
+		
 		# check if single raster
 		if c > 0 and cfg.bndSetPresent == "No":
 			cfg.utls.clearTable(tW)
@@ -202,7 +204,7 @@ class BandsetTab:
 			check = "Yes"
 			try:
 				iBC = cfg.utls.getNumberBandRaster(i)
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				cfg.mx.msgErr25()
@@ -273,7 +275,7 @@ class BandsetTab:
 					# add list items to table
 					tW.setRowCount(c + 1)
 					cfg.utls.addTableItem(tW, itN, c, 0)
-					if len(cfg.bndSetWvLn.values()) > 0:
+					if len(list(cfg.bndSetWvLn.values())) > 0:
 						v = max(cfg.bndSetWvLn.values()) + 1
 					else:
 						v = c + 1
@@ -310,7 +312,7 @@ class BandsetTab:
 	def clearBandSet(self, question = "Yes", refresh = "Yes"):
 		if question == "Yes":
 			# ask for confirm
-			a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Clear band set"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the band set?"))
+			a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Clear band set"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the band set?"))
 		else:
 			a = "Yes"
 		if a == "Yes":
@@ -347,7 +349,7 @@ class BandsetTab:
 			tW.show()
 			if c == 0:
 				self.readBandSet()
-			elif float(tW.item(row, column).text()) in cfg.bndSetWvLn.values():
+			elif float(tW.item(row, column).text()) in list(cfg.bndSetWvLn.values()):
 				cfg.mx.msgWar7()
 				w = str(float(cfg.bndSetWvLn["WAVELENGTH_" + str(row + 1)]))
 				cfg.utls.setTableItem(tW, row, column, w)
@@ -461,7 +463,7 @@ class BandsetTab:
 		# write project variables
 		cfg.utls.writeProjectVariable("bandSetPresent", str(cfg.bndSetPresent))
 		cfg.utls.writeProjectVariable("bandSet", str(cfg.bndSet))
-		cfg.utls.writeProjectVariable("bndSetWvLn", str(cfg.bndSetWvLn.values()))
+		cfg.utls.writeProjectVariable("bndSetWvLn", str(list(cfg.bndSetWvLn.values())))
 		cfg.utls.writeProjectVariable("bndSetMultF", str(cfg.bndSetMultiFactorsList))
 		cfg.utls.writeProjectVariable("bndSetAddF", str(cfg.bndSetAddFactorsList))
 		cfg.utls.writeProjectVariable("bndSetUnit", str(cfg.bndSetUnit["UNIT"]))
@@ -488,7 +490,7 @@ class BandsetTab:
 
 	# export band set to file
 	def exportBandSet(self):
-		bndSetFile = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save the band set to file"), "", "XML (*.xml)")
+		bndSetFile = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save the band set to file"), "", "XML (*.xml)")
 		if len(bndSetFile) > 0:
 			try:
 				tW = cfg.ui.tableWidget
@@ -515,13 +517,13 @@ class BandsetTab:
 					o.close()
 					# logger
 					cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " band set exported")
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		
 	# import band set from file
 	def importBandSet(self):
-		bndSetFile = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a band set file"), "", "XML (*.xml)")
+		bndSetFile = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a band set file"), "", "XML (*.xml)")
 		if len(bndSetFile) > 0:
 			try:
 				tree = cfg.ETSCP.parse(bndSetFile)
@@ -566,7 +568,7 @@ class BandsetTab:
 				cfg.BandTabEdited = "Yes"
 				# logger
 				cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " band set imported")		
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				cfg.mx.msgErr5()
@@ -589,7 +591,7 @@ class BandsetTab:
 			cfg.BandTabEdited = "Yes"
 			# logger
 			cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " band set set")
-		except Exception, err:
+		except Exception as err:
 			cfg.BandTabEdited = "Yes"
 			# logger
 			cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -610,7 +612,7 @@ class BandsetTab:
 			for i in range (0, len(s)):
 				ns.append(s[i].row() + 1)
 			try:
-				for b in reversed(range(0, c)):
+				for b in reversed(list(range(0, c))):
 					if tW.item(b, 0).isSelected() or tW.item(b, 1).isSelected():
 						bNU = tW.item(b, 0).text()
 						bND = tW.item(b + 1, 0).text()
@@ -620,7 +622,7 @@ class BandsetTab:
 				v = list(set(ns))
 				for i in range (0, len(v)):
 					tW.selectRow(v[i])
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				tW.clearSelection()
@@ -666,7 +668,7 @@ class BandsetTab:
 				for b in range(0, c):
 					tW.item(b, 0).setText(str(bNsort[b]))
 				tW.clearSelection()
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				tW.clearSelection()
@@ -701,7 +703,7 @@ class BandsetTab:
 				v = list(set(ns))
 				for i in range (0, len(v)):
 					tW.selectRow(v[i])
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				tW.clearSelection()
@@ -713,7 +715,7 @@ class BandsetTab:
 				
 	# Set raster band checklist
 	def rasterBandName(self):
-		ls = cfg.lgnd.layers()
+		ls = cfg.qgisCoreSCP.QgsProject.instance().mapLayers().values()
 		# checklist
 		l = cfg.ui.raster_listView
 		# create band item model
@@ -747,7 +749,7 @@ class BandsetTab:
 			# add list items to table
 			tW.setRowCount(c + 1)
 			cfg.utls.addTableItem(tW, itN, c, 0, "No")
-			if len(cfg.bndSetWvLn.values()) > 0:
+			if len(list(cfg.bndSetWvLn.values())) > 0:
 				v = max(cfg.bndSetWvLn.values()) + 1
 			else:
 				v = i + 1
@@ -768,7 +770,7 @@ class BandsetTab:
 			pass
 		else:
 			# ask for confirm
-			a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Remove band"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to remove the selected bands from band set?"))
+			a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Remove band"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to remove the selected bands from band set?"))
 			if a == "Yes":
 				r = []
 				for i in tW.selectedItems():
@@ -803,7 +805,7 @@ class BandsetTab:
 				self.allBandSetState(2)
 				# set check all bands
 				self.allBandsCheck = "No"
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				pass
@@ -816,17 +818,17 @@ class BandsetTab:
 		if cfg.bndSetPresent == "Yes" and cfg.rstrNm == cfg.bndSetNm:
 			ck = cfg.utls.checkBandSet()
 			if outFile is None:
-				rstrOut = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save virtual raster"), "", "*.vrt")
+				rstrOut = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save virtual raster"), "", "*.vrt")
 			else:
 				rstrOut = outFile
 			if len(rstrOut) > 0 and ck == "Yes":
-				if unicode(rstrOut).endswith(".vrt"):
+				if str(rstrOut).endswith(".vrt"):
 					rstrOut = rstrOut
 				else:
 					rstrOut = rstrOut + ".vrt"
 				st = cfg.utls.createVirtualRaster(cfg.bndSetLst, rstrOut)
 				# add virtual raster to layers
-				cfg.iface.addRasterLayer(unicode(rstrOut), unicode(cfg.osSCP.path.basename(rstrOut)))
+				cfg.iface.addRasterLayer(str(rstrOut), str(cfg.osSCP.path.basename(rstrOut)))
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " virtual raster: " + str(st))
 			elif ck == "No":
@@ -836,14 +838,14 @@ class BandsetTab:
 		if cfg.bndSetPresent == "Yes" and cfg.rstrNm == cfg.bndSetNm:
 			ck = cfg.utls.checkBandSet()
 			if outFile is None:
-				rstrOut = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster"), "", "*.tif")
+				rstrOut = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster"), "", "*.tif")
 			else:
 				rstrOut = outFile
 			if len(rstrOut) > 0 and ck == "Yes":
 				if outFile is None:
 					cfg.uiUtls.addProgressBar()
 				cfg.cnvs.setRenderFlag(False)
-				if unicode(rstrOut).endswith(".tif"):
+				if str(rstrOut).endswith(".tif"):
 					rstrOut = rstrOut
 				else:
 					rstrOut = rstrOut + ".tif"
@@ -857,7 +859,7 @@ class BandsetTab:
 					try:
 						cfg.utls.GDALCopyRaster(tPMD2, rstrOut, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 						cfg.osSCP.remove(tPMD2)
-					except Exception, err:
+					except Exception as err:
 						cfg.shutilSCP.copy(tPMD2, rstrOut)
 						cfg.osSCP.remove(tPMD2)
 						# logger
@@ -866,7 +868,7 @@ class BandsetTab:
 					cfg.shutilSCP.copy(tPMD2, rstrOut)
 					cfg.osSCP.remove(tPMD2)
 				# add raster to layers
-				cfg.iface.addRasterLayer(unicode(rstrOut), unicode(cfg.osSCP.path.basename(rstrOut)))
+				cfg.iface.addRasterLayer(str(rstrOut), str(cfg.osSCP.path.basename(rstrOut)))
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " raster: " + str(st))
 				cfg.uiUtls.updateBar(100)
@@ -887,7 +889,7 @@ class BandsetTab:
 				a = "Yes"
 			else:
 				# ask for confirm
-				a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Build overviews"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Do you want to build the external overviews of bands?"))
+				a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Build overviews"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Do you want to build the external overviews of bands?"))
 			if a == "Yes":	
 				if quiet == "No":
 					cfg.uiUtls.addProgressBar()
@@ -895,12 +897,12 @@ class BandsetTab:
 					b = 1
 					for i in cfg.bndSetLst:
 						cfg.utls.buildOverviewsGDAL(i)
-						cfg.uiUtls.updateBar((b) * 100 / (len(cfg.bndSetLst)), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", " building overviews"))
+						cfg.uiUtls.updateBar((b) * 100 / (len(cfg.bndSetLst)), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", " building overviews"))
 						b = b + 1
 				else:
 					image = cfg.utls.selectLayerbyName(cfg.rstrNm, "Yes")
 					i = image.source()
-					cfg.uiUtls.updateBar(50, cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", " building overviews"))
+					cfg.uiUtls.updateBar(50, cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", " building overviews"))
 					cfg.utls.buildOverviewsGDAL(i)
 				cfg.uiUtls.updateBar(100)
 				if quiet == "No":
@@ -911,7 +913,7 @@ class BandsetTab:
 				
 	# button perform Band set tools
 	def performBandSetTools(self):
-		i = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
+		i = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
 		if len(i) > 0:
 			cfg.uiUtls.addProgressBar()
 			cfg.bst.bandSetTools(i)
@@ -929,14 +931,14 @@ class BandsetTab:
 			if cfg.ui.virtual_raster_bandset_checkBox.isChecked() is True:
 				try:
 					cfg.bst.virtualRasterBandSet(outputDirectory + "/" + cfg.osSCP.path.basename(cfg.bndSetLst[0]).split(".")[0][:-1] + cfg.virtualRasterNm + ".vrt")
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		if cfg.actionCheck == "Yes":
 			if cfg.ui.stack_raster_bandset_checkBox.isChecked() is True:
 				try:
 					cfg.bst.stackBandSet(outputDirectory + "/" + cfg.osSCP.path.basename(cfg.bndSetLst[0]).split(".")[0][:-1] + cfg.stackRasterNm + ".tif")
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		if cfg.actionCheck == "Yes":

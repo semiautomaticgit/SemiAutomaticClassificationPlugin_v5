@@ -81,7 +81,7 @@ class AlgWeightTab:
 			
 	def resetWeights(self):
 		# ask for confirm
-		a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Reset weights"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to reset weights?"))
+		a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Reset weights"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to reset weights?"))
 		if a == "Yes":
 			self.loadAlgorithmTable(cfg.bndSet)
 		

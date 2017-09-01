@@ -52,7 +52,7 @@ class ReclassificationTab:
 			i = cfg.utls.selectLayerbyName(self.clssfctnNm, "Yes")
 			try:
 				classificationPath = i.source()
-			except Exception, err:
+			except Exception as err:
 				cfg.mx.msg4()
 				cfg.utls.refreshClassificationLayer()
 				# logger
@@ -74,7 +74,7 @@ class ReclassificationTab:
 			c = 1
 		if c > 0:
 			if batch == "No":
-				out = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster output"), "", "*.tif")
+				out = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster output"), "", "*.tif")
 			else:
 				out = rasterOutput
 			if len(out) > 0:
@@ -112,7 +112,7 @@ class ReclassificationTab:
 					try:
 						cfg.utls.GDALCopyRaster(tPMD2, out, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 						cfg.osSCP.remove(tPMD2)
-					except Exception, err:
+					except Exception as err:
 						cfg.shutilSCP.copy(tPMD2, out)
 						cfg.osSCP.remove(tPMD2)
 						# logger
@@ -150,16 +150,16 @@ class ReclassificationTab:
 		i = cfg.utls.selectLayerbyName(self.clssfctnNm, "Yes")
 		try:
 			classificationPath = i.source()
-		except Exception, err:
+		except Exception as err:
 			cfg.mx.msg4()
 			cfg.utls.refreshClassificationLayer()
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			return "No"
 		try:
-			clssRstrSrc = unicode(classificationPath)
+			clssRstrSrc = str(classificationPath)
 			ck = "Yes"
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			ck = "No"

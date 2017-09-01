@@ -96,7 +96,7 @@ class LCSigThresholdTab:
 		cfg.utls.insertTableColumn(l, v, cfg.tableColString, 60, "Yes")
 		x = 0
 		try:
-			for k in cfg.signIDs.values():
+			for k in list(cfg.signIDs.values()):
 				cfg.utls.insertTableRow(l, x)
 				cfg.utls.addTableItem(l, int(cfg.signList["MACROCLASSID_" + str(k)]), x, 0, "No")
 				cfg.utls.addTableItem(l, str(cfg.signList["MACROCLASSINFO_" + str(k)]), x, 1, "No")
@@ -112,7 +112,7 @@ class LCSigThresholdTab:
 					vb = vb + 1
 				cfg.utls.addTableItem(l, str(cfg.signIDs["ID_" + str(k)]), x, v, "No")
 				x = x + 1
-		except Exception, err:
+		except Exception as err:
 			cfg.utls.clearTable(l)
 			cfg.mx.msgErr57("MC" +str(cfg.signList["MACROCLASSID_" + str(k)]) + ";C" + str(cfg.signList["CLASSID_" + str(k)]) + ";" + str(cfg.signList["CLASSINFO_" + str(k)]) )
 			# logger
@@ -165,7 +165,7 @@ class LCSigThresholdTab:
 	def checkIntersections(self):
 		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "")
 		intersect = []
-		cmb = list(cfg.itertoolsSCP.combinations(cfg.signIDs.values(), 2))
+		cmb = list(cfg.itertoolsSCP.combinations(list(cfg.signIDs.values()), 2))
 		for a in cmb:
 			id0 = a[0]
 			minA = cfg.np.array(cfg.signList["LCS_MIN_" + str(id0)])
@@ -194,7 +194,7 @@ class LCSigThresholdTab:
 		self.orderColumn = column
 		tW = cfg.ui.LCS_tableWidget
 		count = tW.rowCount()
-		v = range(0, count)
+		v = list(range(0, count))
 		vx = cfg.bandsetCount * 2 + 5
 		for x in v:
 			id = tW.item(x, vx).text()
@@ -301,10 +301,10 @@ class LCSigThresholdTab:
 		v = list(set(iR))
 		if len(v) == 0:
 			count = tW.rowCount()
-			v = range(0, count)
+			v = list(range(0, count))
 		if len(v) > 1:
 			# ask for confirm
-			a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Set thresholds"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to set thresholds for several signatures?"))
+			a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Set thresholds"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to set thresholds for several signatures?"))
 			if a == "Yes":
 				pass
 			else:
@@ -317,7 +317,7 @@ class LCSigThresholdTab:
 		for x in reversed(v):
 			progrStep = progrStep + 100/(len(v))
 			cfg.uiUtls.updateBar(int(progrStep))
-			cfg.QtGuiSCP.qApp.processEvents()
+			cfg.QtWidgetsSCP.qApp.processEvents()
 			idCol = cfg.bandsetCount * 2 +5
 			id = tW.item(x, idCol).text()
 			# values
@@ -362,10 +362,10 @@ class LCSigThresholdTab:
 			v = list(set(iR))
 			if len(v) == 0:
 				count = tW.rowCount()
-				v = range(0, count)
+				v = list(range(0, count))
 			if len(v) > 1:
 				# ask for confirm
-				a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Set thresholds"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to set thresholds for several signatures?"))
+				a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Set thresholds"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to set thresholds for several signatures?"))
 				if a == "Yes":
 					pass
 				else:
@@ -463,10 +463,10 @@ class LCSigThresholdTab:
 		v = list(set(iR))
 		if len(v) == 0:
 			count = tW.rowCount()
-			v = range(0, count)
+			v = list(range(0, count))
 		if len(v) > 1:
 			# ask for confirm
-			a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Set thresholds"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to set thresholds for several signatures?"))
+			a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Set thresholds"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to set thresholds for several signatures?"))
 			if a == "Yes":
 				pass
 			else:
@@ -507,10 +507,10 @@ class LCSigThresholdTab:
 			v = list(set(iR))
 			if len(v) == 0:
 				count = tW.rowCount()
-				v = range(0, count)
+				v = list(range(0, count))
 			if len(v) > 1:
 				# ask for confirm
-				a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Set thresholds"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to set thresholds for several signatures?"))
+				a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Set thresholds"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to set thresholds for several signatures?"))
 				if a == "Yes":
 					pass
 				else:
@@ -581,8 +581,8 @@ class LCSigThresholdTab:
 				progress = progress * progresStep
 				idCol = cfg.bandsetCount * 2 +5
 				id = tW.item(x, idCol).text()
-				if id in cfg.signIDs.values():
-					if id not in cfg.signPlotIDs.values():
+				if id in list(cfg.signIDs.values()):
+					if id not in list(cfg.signPlotIDs.values()):
 						cfg.classD.sigListToPlot(id)
 				else:
 					rId = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(id))

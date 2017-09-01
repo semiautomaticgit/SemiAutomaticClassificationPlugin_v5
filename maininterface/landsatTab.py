@@ -43,20 +43,20 @@ class LandsatTab:
 		
 	# landsat input
 	def inputLandsat(self):
-		i = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
-		cfg.ui.label_26.setText(unicode(i))
+		i = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
+		cfg.ui.label_26.setText(str(i))
 		self.populateTable(i)
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(i))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(i))
 		
 	# MTL input
 	def inputMTL(self):
-		m = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a MTL file"), "", "MTL file .txt (*.txt);;MTL file .met (*.met)")
-		cfg.ui.label_27.setText(unicode(m))
+		m = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a MTL file"), "", "MTL file .txt (*.txt);;MTL file .met (*.met)")
+		cfg.ui.label_27.setText(str(m))
 		if len(cfg.ui.label_26.text()) > 0:
 			self.populateTable(cfg.ui.label_26.text())
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(m))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(m))
 
 	# landsat conversion to reflectance and temperature
 	def landsat(self, inputDirectory, outputDirectory, batch = "No"):
@@ -90,7 +90,7 @@ class LandsatTab:
 		if len(cfg.ui.earth_sun_dist_lineEdit.text()) > 0:
 			try:
 				self.eSD = float(cfg.ui.earth_sun_dist_lineEdit.text())
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " No earth sun distance error")
 				if batch == "No":
@@ -103,9 +103,9 @@ class LandsatTab:
 			dt = cfg.ui.date_lineEdit.text()
 			try:
 				self.eSD = cfg.utls.calculateEarthSunDistance(dt, dFmt)
-			except Exception, err:
+			except Exception as err:
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				if batch == "No":
 					cfg.uiUtls.removeProgressBar()
 					cfg.cnvs.setRenderFlag(True)
@@ -297,11 +297,11 @@ class LandsatTab:
 				try:
 					cfg.utls.GDALCopyRaster(temp, outputRasterList[bN], "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 					cfg.osSCP.remove(temp)
-				except Exception, err:
+				except Exception as err:
 					try:
 						cfg.shutilSCP.copy(temp, outputRasterList[bN])
 						cfg.osSCP.remove(temp)
-					except Exception, err:
+					except Exception as err:
 						# logger
 						if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					# logger
@@ -316,7 +316,7 @@ class LandsatTab:
 				cfg.mx.msgErr44()
 				panCheck = "No"
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "Missing bands " + unicode(bandNumberList))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "Missing bands " + str(bandNumberList))
 		if cfg.actionCheck == "Yes":
 			# load raster bands
 			for outR in outputRasterList:
@@ -324,7 +324,7 @@ class LandsatTab:
 					cfg.iface.addRasterLayer(outR)
 				else:
 					cfg.mx.msgErr38(outR)
-					cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "WARNING: unable to load raster" + unicode(outR))
+					cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "WARNING: unable to load raster" + str(outR))
 			if cfg.ui.pansharpening_checkBox.isChecked() is True and panCheck != "No":
 				bandSetNameList = []
 				rasterList = []
@@ -336,7 +336,7 @@ class LandsatTab:
 						rasterList.append(outR)
 					else:
 						cfg.mx.msgErr38(outR)
-						cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "WARNING: unable to load raster" + unicode(outR))
+						cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "WARNING: unable to load raster" + str(outR))
 			# create band set
 			if cfg.ui.create_bandset_checkBox.isChecked() is True:
 				if str(sat).lower() in ['landsat8', 'landsat_8']:
@@ -406,15 +406,15 @@ class LandsatTab:
 					cfg.osSCP.remove(tPMD2)
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "files deleted")
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(inputRaster))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(inputRaster))
 				return "Yes"
-			except Exception, err:
+			except Exception as err:
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				return "No"
 		# DOS atmospheric correction
 		elif cfg.ui.DOS1_checkBox.isChecked() is True:
@@ -468,15 +468,15 @@ class LandsatTab:
 					cfg.osSCP.remove(tPMD2)
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "files deleted")
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(inputRaster))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(inputRaster))
 				return "Yes"
-			except Exception, err:
+			except Exception as err:
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				return "No"
 				
 	# raster reclassification <0 and >1
@@ -496,7 +496,7 @@ class LandsatTab:
 			bL[b] = None
 		rD = None
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(inputRaster))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(inputRaster))
 						
 	# landsat 1 to 7 conversion to Reflectance
 	def landsat1_7reflectance(self, satellite, bandNumber, RADIANCE_MULT_BAND, RADIANCE_ADD_BAND, inputRaster, outputRaster):
@@ -535,9 +535,9 @@ class LandsatTab:
 		try:
 			m = float(RADIANCE_MULT_BAND) * multipFactor
 			a = float(RADIANCE_ADD_BAND) * multipFactor
-		except Exception, err:
+		except Exception as err:
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			return "No"
 		# temp files
 		dT = cfg.utls.getTime()
@@ -571,15 +571,15 @@ class LandsatTab:
 					cfg.osSCP.remove(tPMD2)
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "files deleted")
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(inputRaster))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(inputRaster))
 				return "Yes"
-			except Exception, err:
+			except Exception as err:
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				return "No"
 		# DOS atmospheric correction
 		elif cfg.ui.DOS1_checkBox.isChecked() is True:
@@ -630,15 +630,15 @@ class LandsatTab:
 					cfg.osSCP.remove(tPMD2)
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "files deleted")
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(inputRaster))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(inputRaster))
 				return "Yes"
-			except Exception, err:
+			except Exception as err:
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				return "No"
 			
 	# landsat 4,5, or 7 temperature
@@ -688,10 +688,10 @@ class LandsatTab:
 				bL[b] = None
 			rD = None
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(outputRaster))
-		except Exception, err:
+			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(outputRaster))
+		except Exception as err:
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))		
+			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))		
 			
 	# landsat 8 temperature
 	def landsat8Temperature(self, RADIANCE_MULT_BAND, RADIANCE_ADD_BAND, K1_CONSTANT_BAND, K2_CONSTANT_BAND, inputRaster, outputRaster):
@@ -725,23 +725,23 @@ class LandsatTab:
 				bL[b] = None
 			rD = None
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), unicode(outputRaster))
-		except Exception, err:
+			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), str(outputRaster))
+		except Exception as err:
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 	
 	# landsat correction button
 	def performLandsatCorrection(self):
 		if len(cfg.ui.label_26.text()) == 0:
 			cfg.mx.msg14()
 		else:
-			o = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
+			o = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
 			if len(o) == 0:
 				cfg.mx.msg14()
 			else:
 				self.landsat(cfg.ui.label_26.text(), o)
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "Perform landsat correction: " + unicode(cfg.ui.label_26.text()))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "Perform landsat correction: " + str(cfg.ui.label_26.text()))
 		
 	# populate table
 	def populateTable(self, input, batch = "No"):
@@ -789,9 +789,9 @@ class LandsatTab:
 							dt = str(r.split()[2])
 						if "RADIANCE_UNITS" in r.split():
 							cfg.RADIANCE_UNITS = str(r.split()[2])
-			except Exception, err:
+			except Exception as err:
 				# logger
-				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				if batch == "No":
 					cfg.uiUtls.removeProgressBar()
 				cfg.mx.msgErr8()
@@ -801,9 +801,9 @@ class LandsatTab:
 				dFmt = "%Y-%m-%d"
 				try:
 					esd = str(cfg.utls.calculateEarthSunDistance(dt, dFmt))
-				except Exception, err:
+				except Exception as err:
 					# logger
-					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))
+					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.ui.satellite_lineEdit.setText(sat)
 			cfg.ui.date_lineEdit.setText(dt)
 			cfg.ui.sun_elev_lineEdit.setText(sE)
@@ -874,7 +874,7 @@ class LandsatTab:
 				# get information from MTL
 				with open(MTLFile, "r") as MTL:
 					for r in MTL:
-						for key, band in dBs.iteritems():
+						for key, band in dBs.items():
 							try:
 								# for conversion to TOA Radiance from https://landsat.usgs.gov/landsat8_Using_Product.php
 								if "RADIANCE_MULT_" + str(key) in r.split():
@@ -910,13 +910,13 @@ class LandsatTab:
 									dRadMB["RADIANCE_MULT_" + str(key)] = str(r.split()[2])
 								if "BIAS_" + str(key) in r.split() or ("BIAS_" + str(key)).replace("BAND_", "BAND") in r.split():
 									dRadAB["RADIANCE_ADD_" + str(key)] = str(r.split()[2])
-							except Exception, err:
+							except Exception as err:
 								# logger
-								cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + unicode(err))	
+								cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))	
 				# add items to table
 				b = 0
 				for bandName in sorted(bandNames):	
-					for key, band in dBs.iteritems():
+					for key, band in dBs.items():
 						if bandName == band:
 							if dRadMB:
 								try:
@@ -1048,11 +1048,11 @@ class LandsatTab:
 			try:
 				cfg.utls.GDALCopyRaster(temp, outputList[bN], "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 				cfg.osSCP.remove(temp)
-			except Exception, err:
+			except Exception as err:
 				try:
 					cfg.shutilSCP.copy(temp, outputRasterList[bN])
 					cfg.osSCP.remove(temp)
-				except Exception, err:
+				except Exception as err:
 					# logger
 					if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				# logger

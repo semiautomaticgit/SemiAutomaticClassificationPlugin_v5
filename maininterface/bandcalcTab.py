@@ -96,7 +96,7 @@ class BandCalcTab:
 	def clearRules(self, question = "Yes"):
 		if question == "Yes":
 			# ask for confirm
-			a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Clear rules"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the rules?"))
+			a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Clear rules"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the rules?"))
 		else:
 			a = "Yes"
 		if a == "Yes":
@@ -172,7 +172,7 @@ class BandCalcTab:
 		
 	# import rules from text file
 	def importRules(self):
-		file = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a text file of rules"), "", "txt (*.txt)")
+		file = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a text file of rules"), "", "txt (*.txt)")
 		if len(file) > 0:
 			self.clearRules("No")
 			tW = cfg.ui.decision_rules_tableWidget
@@ -206,7 +206,7 @@ class BandCalcTab:
 		tW = cfg.ui.decision_rules_tableWidget
 		c = tW.rowCount()
 		if c > 0:
-			file = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save the rules to file"), "", "txt (*.txt)")
+			file = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save the rules to file"), "", "txt (*.txt)")
 			if len(file) > 0:
 				if file.lower().endswith(".txt"):
 					pass
@@ -237,7 +237,7 @@ class BandCalcTab:
 	# Set raster band table
 	def rasterBandName(self):
 		cfg.utls.refreshRasterExtent()
-		ls = cfg.lgnd.layers()
+		ls = cfg.qgisCoreSCP.QgsProject.instance().mapLayers().values()
 		l = cfg.ui.tableWidget_band_calc
 		l.setSortingEnabled(False)
 		cfg.utls.clearTable(l)
@@ -348,7 +348,7 @@ class BandCalcTab:
 								# name and expression
 								n = v[0]
 								e = v[1].strip()
-								cfg.expressionListBC.append([n.decode(cfg.sysSCP.getfilesystemencoding()), e.decode(cfg.sysSCP.getfilesystemencoding())])
+								cfg.expressionListBC.append([n, e])
 							except:
 								pass
 							# logger
@@ -360,7 +360,7 @@ class BandCalcTab:
 						# save in registry
 						cfg.sets.setQGISRegSetting(cfg.regExpressionListBC, cfg.expressionListBCbase)
 						cfg.bCalc.createExpressionList(cfg.expressionListBCbase)
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				
@@ -414,13 +414,13 @@ class BandCalcTab:
 				if cfg.bandCalcIndex == 0:
 					textCount = cfg.ui.plainTextEdit_calc.blockCount()
 					if textCount > 1:
-						outF = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
+						outF = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
 						outF = outF + "/" + cfg.calcRasterNm + ".tif"
 					else:
-						outF = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster output"), "", "*.tif")
+						outF = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster output"), "", "*.tif")
 				# decision rules
 				elif cfg.bandCalcIndex == 1:
-					outF = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster output"), "", "*.tif")
+					outF = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster output"), "", "*.tif")
 			else:
 				outF = outFile
 			if len(outF) > 0:
@@ -445,7 +445,7 @@ class BandCalcTab:
 					dCheck = "Yes"
 					try:
 						eN = self.checkOutputName(eM[1])
-					except Exception, err:
+					except Exception as err:
 						dCheck = "No"
 						cfg.mx.msg4()
 						# logger
@@ -463,14 +463,14 @@ class BandCalcTab:
 							if eN is None and len(check) == 1:
 								out = cfg.osSCP.path.dirname(outF) + "/" + n.rstrip(n[len(n) - 4: len(n)]) + ".tif"
 							elif eN is None and len(check) > 1:
-								out = cfg.osSCP.path.dirname(outF) + "/" + n.rstrip(n[len(n) - 4: len(n)]) + "_" + unicode(it) + ".tif"
+								out = cfg.osSCP.path.dirname(outF) + "/" + n.rstrip(n[len(n) - 4: len(n)]) + "_" + str(it) + ".tif"
 							else:
 								out = cfg.osSCP.path.dirname(outF) + "/" + n.rstrip(n[len(n) - 4: len(n)]) + ".tif"
 						else:
 							if eN is None and len(check) == 1:
 								out = cfg.osSCP.path.dirname(outF) + "/" + n + ".tif"
 							elif eN is None and len(check) > 1:
-								out = cfg.osSCP.path.dirname(outF) + "/" + n + "_" + unicode(it) + ".tif"
+								out = cfg.osSCP.path.dirname(outF) + "/" + n + "_" + str(it) + ".tif"
 							else:
 								out = cfg.osSCP.path.dirname(outF) + "/" + n + ".tif"
 						tPMN = cfg.tmpVrtNm + ".vrt"
@@ -487,7 +487,7 @@ class BandCalcTab:
 						for b in range(0, c):
 							bV = tW.item(b, 0).text()
 							bN = tW.item(b, 1).text()
-							if unicode('"' +  bV +'"') in e or unicode('"' + bN +'"') in e:
+							if str('"' +  bV +'"') in e or str('"' + bN +'"') in e:
 								variableList.append(['"' + bV + '"', '"' + bN + '"'])
 								if cfg.variableBandsetName in bN:
 									bandNumber = bN.split("#b")
@@ -499,7 +499,7 @@ class BandCalcTab:
 										i = cfg.utls.selectLayerbyName(cfg.imgNm, "Yes")
 										try:
 											bPath = i.source()
-										except Exception, err:
+										except Exception as err:
 											cfg.mx.msg4()
 											self.rasterBandName()
 											# logger
@@ -533,7 +533,7 @@ class BandCalcTab:
 										i = cfg.utls.selectLayerbyName(cfg.imgNm, "Yes")
 										try:
 											bPath = i.source()
-										except Exception, err:
+										except Exception as err:
 											cfg.mx.msg4()
 											self.rasterBandName()
 											# logger
@@ -548,7 +548,7 @@ class BandCalcTab:
 									i = cfg.utls.selectLayerbyName(bN, "Yes")
 									try:
 										bPath = i.source()
-									except Exception, err:
+									except Exception as err:
 										cfg.mx.msg4()
 										self.rasterBandName()
 										# logger
@@ -562,7 +562,7 @@ class BandCalcTab:
 						try:
 							gdalRaster2 = cfg.gdalSCP.Open(bPath, cfg.gdalSCP.GA_ReadOnly)
 							gBand2 = gdalRaster2.GetRasterBand(int(1)) 
-						except Exception, err:
+						except Exception as err:
 							cfg.mx.msg4()
 							self.rasterBandName()
 							# logger
@@ -619,7 +619,7 @@ class BandCalcTab:
 												tLY = tLPoint.y()
 												lRX = lRPoint.x()
 												lRY = lRPoint.y()
-										except Exception, err:
+										except Exception as err:
 											# logger
 											cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 											cfg.uiUtls.removeProgressBar()
@@ -635,7 +635,7 @@ class BandCalcTab:
 										i = cfg.utls.selectLayerbyName(extRaster, "Yes")
 										try:
 											bPath = i.source()
-										except Exception, err:
+										except Exception as err:
 											cfg.mx.msg4()
 											self.rasterBandName()
 											# logger
@@ -691,14 +691,14 @@ class BandCalcTab:
 									else:
 										try:
 											cfg.shutilSCP.copy(tPMD2, out)
-										except Exception, err:
+										except Exception as err:
 											# logger
 											if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 									cfg.osSCP.remove(tPMD2)
-								except Exception, err:
+								except Exception as err:
 									try:
 										cfg.shutilSCP.copy(tPMD2, out)
-									except Exception, err:
+									except Exception as err:
 										# logger
 										if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 									cfg.osSCP.remove(tPMD2)
@@ -707,7 +707,7 @@ class BandCalcTab:
 							else:
 								try:
 									cfg.shutilSCP.copy(tPMD2, out)
-								except Exception, err:
+								except Exception as err:
 									# logger
 									if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 								cfg.osSCP.remove(tPMD2)
@@ -715,7 +715,7 @@ class BandCalcTab:
 								r = cfg.utls.addRasterLayer(out, cfg.osSCP.path.basename(out))
 								try:
 									cfg.utls.rasterSymbolSingleBandGray(r)
-								except Exception, err:
+								except Exception as err:
 									# logger
 									if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						it = it + 1
@@ -798,7 +798,7 @@ class BandCalcTab:
 						elif cfg.bandCalcIndex == 1:
 							self.decisionRulesButton = True
 						cfg.ui.toolButton_calculate.setEnabled(True)
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						check = "No"
@@ -885,7 +885,7 @@ class BandCalcTab:
 			tW.clearSelection()
 			v = list(set(ns))
 			cfg.utls.selectRowsInTable(tW, v)
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			tW.clearSelection()
@@ -902,7 +902,7 @@ class BandCalcTab:
 		for i in range (0, len(s)):
 			ns.append(s[i].row() + 1)
 		try:
-			for b in reversed(range(0, c)):
+			for b in reversed(list(range(0, c))):
 				if tW.item(b, 0).isSelected() or tW.item(b, 1).isSelected():
 					bNU = tW.item(b, 0).text()
 					bND = tW.item(b + 1, 0).text()
@@ -915,7 +915,7 @@ class BandCalcTab:
 			tW.clearSelection()
 			v = list(set(ns))
 			cfg.utls.selectRowsInTable(tW, v)
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			tW.clearSelection()

@@ -51,25 +51,25 @@ class ClassificationDock:
 	# set algorithm
 	def algorithmName(self):
 		cfg.algName = cfg.uidc.algorithm_combo.currentText()
-		if unicode(cfg.algName) == cfg.algML:
+		if str(cfg.algName) == cfg.algML:
 			if cfg.algThrshld > 100:
 				cfg.mx.msg10()
 				cfg.uidc.alg_threshold_SpinBox.setValue(100)
-		elif unicode(cfg.algName) == cfg.algSAM:
+		elif str(cfg.algName) == cfg.algSAM:
 			if cfg.algThrshld > 90:
 				cfg.mx.msg11()
 				cfg.uidc.alg_threshold_SpinBox.setValue(90)
-		cfg.utls.writeProjectVariable("ClassAlgorithm", unicode(cfg.algName))
+		cfg.utls.writeProjectVariable("ClassAlgorithm", str(cfg.algName))
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "training name: " + unicode(cfg.algName))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "training name: " + str(cfg.algName))
 				
 	# set algorithm threshold
 	def algorithmThreshold(self):
 		cfg.algThrshld = cfg.uidc.alg_threshold_SpinBox.value()
-		if unicode(cfg.algName) == cfg.algML:
+		if str(cfg.algName) == cfg.algML:
 			if cfg.algThrshld > 100:
 				cfg.uidc.alg_threshold_SpinBox.setValue(100)
-		elif unicode(cfg.algName) == cfg.algSAM:
+		elif str(cfg.algName) == cfg.algSAM:
 			if cfg.algThrshld > 90:
 				cfg.uidc.alg_threshold_SpinBox.setValue(90)
 		cfg.algThrshld = cfg.uidc.alg_threshold_SpinBox.value()
@@ -86,9 +86,9 @@ class ClassificationDock:
 		if hasattr(classLayer, "setCacheImage"):
 			classLayer.setCacheImage(None)
 		classLayer.triggerRepaint()
-		cfg.lgnd.refreshLayerSymbology(classLayer)
+		cfg.utls.refreshLayerSymbology(classLayer)
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "classification symbology applied with qml: " + unicode(stylePath))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "classification symbology applied with qml: " + str(stylePath))
 			
 	# set preview transparency
 	def changePreviewTransparency(self, value):
@@ -102,7 +102,7 @@ class ClassificationDock:
 				l.triggerRepaint()
 				cfg.cnvs.setRenderFlag(True)
 				cfg.cnvs.refresh()
-		except Exception, err:
+		except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			
@@ -112,10 +112,10 @@ class ClassificationDock:
 			l = cfg.utls.selectLayerbyName(cfg.lastPrev)
 			if l is not None:
 				if cfg.show_preview_radioButton2.isChecked():				
-					cfg.lgnd.setLayerVisible(l, True)
+					cfg.utls.setLayerVisible(l, True)
 					cfg.utls.moveLayerTop(l)
 				else:
-					cfg.lgnd.setLayerVisible(l, False)
+					cfg.utls.setLayerVisible(l, False)
 		except:
 			pass
 			
@@ -189,16 +189,16 @@ class ClassificationDock:
 							g = cfg.utls.createGroup(cfg.grpNm)
 						preP = cfg.utls.selectLayerbyName(lastPrevX)
 						if preP is not None:
-							cfg.lgnd.moveLayer(preP, g)
-						cfg.lgnd.setGroupVisible(g, False)
-						cfg.lgnd.setGroupExpanded(g, False)
+							cfg.utls.moveLayer(preP, cfg.grpNm)
+						cfg.utls.setGroupVisible(g, False)
+						cfg.utls.setGroupExpanded(g, False)
 						cfg.show_preview_radioButton2.setChecked(True)
 					cfg.uiUtls.updateBar(100)
 					# enable map canvas render
 					cfg.cnvs.setRenderFlag(True)
 					cfg.uiUtls.removeProgressBar()
 					# logger
-					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "<<< PREVIEW created: " + unicode(pN))
+					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "<<< PREVIEW created: " + str(pN))
 					# enable Redo button
 					cfg.redoPreviewButton.setEnabled(True)
 				else:
@@ -218,14 +218,14 @@ class ClassificationDock:
 	# calculate signatures for checked ROIs
 	def getSignatureList(self):
 		refreshTable = None
-		for i in cfg.ROI_SCP_UID.values():
-			if str(i) not in cfg.signIDs.values() and cfg.signList["CHECKBOX_" + str(i)] == 2:
+		for i in list(cfg.ROI_SCP_UID.values()):
+			if str(i) not in list(cfg.signIDs.values()) and cfg.signList["CHECKBOX_" + str(i)] == 2:
 				rId = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(i))
 				cfg.utls.calculateSignature(cfg.shpLay, cfg.rstrNm, rId, cfg.ROI_MC_ID[i], cfg.ROI_MC_Info[i], cfg.ROI_C_ID[i], cfg.ROI_C_Info[i], None, None, "No", "No", i)
 				refreshTable = "Yes"
 		if refreshTable == "Yes":
 			cfg.classD.ROIListTable(cfg.trnLay, cfg.uidc.signature_list_tableWidget)
-		id = cfg.signIDs.values()
+		id = list(cfg.signIDs.values())
 		signatureList = []
 		for i in id:
 			if cfg.signList["CHECKBOX_" + str(i)] == 2:
@@ -240,7 +240,7 @@ class ClassificationDock:
 				s.append(cfg.signList["COVMATRIX_" + str(i)])
 				s.append(cfg.signList["LCS_MIN_" + str(i)])
 				s.append(cfg.signList["LCS_MAX_" + str(i)])
-				if len(cfg.signList["WAVELENGTH_" + str(i)]) == len(cfg.bndSetWvLn.values()):
+				if len(cfg.signList["WAVELENGTH_" + str(i)]) == len(list(cfg.bndSetWvLn.values())):
 					if str(sorted(cfg.signList["WAVELENGTH_" + str(i)])) != str(sorted(cfg.bndSetWvLn.values())):
 						cfg.mx.msgWar9(cfg.signList["MACROCLASSID_" + str(i)], cfg.signList["CLASSID_" + str(i)])
 					# check if signature has covariance matrix if maximum likelihood
@@ -306,10 +306,10 @@ class ClassificationDock:
 	# set variable for mask
 	def maskCheckbox(self):
 		if cfg.uidc.mask_checkBox.isChecked() is True:
-			m = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a mask shapefile"), "", "Shapefile (*.shp)")
+			m = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a mask shapefile"), "", "Shapefile (*.shp)")
 			if len(m) > 0:
 				cfg.mskFlPath = m
-				cfg.uidc.mask_lineEdit.setText(unicode(cfg.mskFlPath))
+				cfg.uidc.mask_lineEdit.setText(str(cfg.mskFlPath))
 				cfg.mskFlState = 2
 			else:
 				cfg.mskFlState = 2
@@ -317,16 +317,16 @@ class ClassificationDock:
 					cfg.uidc.mask_checkBox.setCheckState(0)
 		else:
 			cfg.mskFlState = 0
-		cfg.utls.writeProjectVariable("maskFilePath", unicode(cfg.mskFlPath))	
-		cfg.utls.writeProjectVariable("maskFileState", unicode(cfg.mskFlState))	
+		cfg.utls.writeProjectVariable("maskFilePath", str(cfg.mskFlPath))	
+		cfg.utls.writeProjectVariable("maskFileState", str(cfg.mskFlState))	
 		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " checkbox set: " + str(cfg.mskFlState))
 		
 	# Reset mask path
 	def resetMask(self):
 		cfg.mskFlPath = ""
 		cfg.mskFlState = 0
-		cfg.utls.writeProjectVariable("maskFilePath", unicode(cfg.mskFlPath))	
-		cfg.utls.writeProjectVariable("maskFileState", unicode(cfg.mskFlState))	
+		cfg.utls.writeProjectVariable("maskFilePath", str(cfg.mskFlPath))	
+		cfg.utls.writeProjectVariable("maskFileState", str(cfg.mskFlState))	
 		cfg.uidc.mask_lineEdit.setText(str(cfg.mskFlPath))
 		self.setMaskCheckbox()
 		# logger
@@ -414,7 +414,7 @@ class ClassificationDock:
 			# open input with GDAL
 			bL = []
 			for i in range(0, len(bS)):
-				rD = cfg.gdalSCP.Open(unicode(bS[i]), cfg.gdalSCP.GA_ReadOnly)
+				rD = cfg.gdalSCP.Open(str(bS[i]), cfg.gdalSCP.GA_ReadOnly)
 				bL.append(rD)
 		else:
 			# if masked raster
@@ -471,7 +471,7 @@ class ClassificationDock:
 				try:
 					cfg.utls.GDALCopyRaster(tPMD2, outputRasterPath, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 					cfg.osSCP.remove(tPMD2)
-				except Exception, err:
+				except Exception as err:
 					cfg.shutilSCP.copy(tPMD2, outputRasterPath)
 					cfg.osSCP.remove(tPMD2)
 					# logger
@@ -510,7 +510,7 @@ class ClassificationDock:
 			cfg.uiUtls.removeProgressBar()
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " all signatures")
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.uiUtls.removeProgressBar()
@@ -524,22 +524,22 @@ class ClassificationDock:
 		sL = self.getSignatureList()
 		if self.trainSigCheck == "Yes":
 			if batch == "No":
-				clssOut = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save classification output"), "", "Image (*.tif)")
+				clssOut = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save classification output"), "", "Image (*.tif)")
 			else:
 				clssOut = outputClassification
 			if len(clssOut) > 0:
 				clssOut = clssOut.replace('\\', '/')
 				clssOut = clssOut.replace('//', '/')
 				cfg.clssPth = clssOut
-				sN = cfg.osSCP.path.basename(unicode(clssOut))
-				if unicode(sN).endswith(".tif"):
+				sN = cfg.osSCP.path.basename(str(clssOut))
+				if str(sN).endswith(".tif"):
 					cfg.clssPth = clssOut
 				else:
 					nm = cfg.osSCP.path.splitext(sN)[0]
 					cfg.clssPth = cfg.osSCP.path.dirname(clssOut) + '/' + nm + ".tif"
-			cfg.QtGuiSCP.qApp.processEvents()
+			cfg.QtWidgetsSCP.qApp.processEvents()
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "classification output: " + unicode(cfg.clssPth))	
+			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "classification output: " + str(cfg.clssPth))	
 			# check if can run classification
 			ckC = "Yes"
 			if cfg.imgNm is None:
@@ -596,9 +596,9 @@ class ClassificationDock:
 					cfg.uiUtls.updateBar(20)
 					# compression
 					compress = cfg.rasterCompression
-					ok, opOut, mOut = self.runAlgorithm(cfg.algName, img, sL, cfg.clssPth, cfg.macroclassCheck, None, None, None, compress)
+					ok, opOut, mOut = self.runAlgorithm(cfg.algName, img, sL, cfg.clssPth, cfg.macroclassCheck, None, 0, None, compress)
 					if ok == "Yes":
-						c = cfg.iface.addRasterLayer(cfg.clssPth, cfg.osSCP.path.basename(unicode(cfg.clssPth)))
+						c = cfg.iface.addRasterLayer(cfg.clssPth, cfg.osSCP.path.basename(str(cfg.clssPth)))
 						cfg.utls.moveLayerTop(c)
 						cfg.uiUtls.updateBar(80)
 						# apply symbology
@@ -606,7 +606,7 @@ class ClassificationDock:
 						# save qml file
 						cfg.utls.saveQmlStyle(c, cfg.osSCP.path.dirname(clssOut) + '/' + nm + ".qml")
 						# logger
-						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "<<< CLASSIFICATION PERFORMED: " + unicode(cfg.clssPth))
+						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "<<< CLASSIFICATION PERFORMED: " + str(cfg.clssPth))
 				### calculate report
 					if cfg.reportCheck == "Yes":
 						reportOut = cfg.osSCP.path.dirname(cfg.clssPth) + "/" + nm + cfg.reportNm
@@ -614,11 +614,12 @@ class ClassificationDock:
 				### convert classification to vector
 					cfg.uiUtls.updateBar(85)
 					if cfg.vectorOutputCheck == "Yes":
-						cfg.uiUtls.updateBar(85, cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", " conversion to vector. Please wait ..."))
+						cfg.uiUtls.updateBar(85, cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", " conversion to vector. Please wait ..."))
 						vO = cfg.osSCP.path.dirname(cfg.clssPth) + "/" + nm + ".shp"
 						cfg.utls.rasterToVector(cfg.clssPth, vO)
 						vl = cfg.utls.addVectorLayer(str(vO), cfg.osSCP.path.basename(vO), "ogr")
-						cfg.utls.vectorSymbol(vl, sL, cfg.macroclassCheck)
+						# apply symbology
+						self.applyClassSymbologyVector(vl, cfg.macroclassCheck, cfg.qmlFl, sL)
 						cfg.utls.addLayerToMap(vl)
 					cfg.uiUtls.updateBar(95)
 				### copy signature raster
@@ -631,7 +632,7 @@ class ClassificationDock:
 								if cfg.rasterCompression != "No":
 									try:
 										cfg.utls.GDALCopyRaster(r, rOBaseNm + "/" + bNm, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
-									except Exception, err:
+									except Exception as err:
 										cfg.shutilSCP.copy(r, rOBaseNm + "/" + bNm)
 										# logger
 										if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -644,7 +645,7 @@ class ClassificationDock:
 							if cfg.rasterCompression != "No":
 								try:
 									cfg.utls.GDALCopyRaster(mOut, rOBaseNm + "/" + mOutNm, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
-								except Exception, err:
+								except Exception as err:
 									cfg.shutilSCP.copy(mOut, rOBaseNm + "/" + mOutNm)
 									# logger
 									if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -655,7 +656,7 @@ class ClassificationDock:
 								cfg.utls.rasterSymbolLCSAlgorithmRaster(c)
 							# logger
 							cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "files copied")
-						except Exception, err:
+						except Exception as err:
 							# logger
 							cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 							cfg.mx.msgErr23()
@@ -665,7 +666,7 @@ class ClassificationDock:
 						cfg.osSCP.remove(mOut)
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "files deleted")
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				### ending
@@ -692,6 +693,23 @@ class ClassificationDock:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "classification no")	
 			
+			
+	# apply symbology to classification vector	
+	def applyClassSymbologyVector(self, classificationVector, macroclassCheck, qmlFile, signatureList = None):
+		# qml symbology
+		if qmlFile == "":
+			if macroclassCheck == "Yes":
+				signatureList = cfg.classD.createMCIDList()
+				if len(signatureList) == 0:
+					cfg.mx.msgWar19()
+			cfg.utls.vectorSymbol(classificationVector, signatureList, macroclassCheck)
+		else:
+			try:
+				self.applyQmlStyle(classificationRaster, qmlFile)
+			except Exception as err:
+				# logger
+				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
+				
 	# apply symbology to classification			
 	def applyClassSymbology(self, classificationRaster, macroclassCheck, qmlFile, signatureList = None):
 		# qml symbology
@@ -704,19 +722,19 @@ class ClassificationDock:
 		else:
 			try:
 				self.applyQmlStyle(classificationRaster, qmlFile)
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 							
 	# Select qml style for classifications and previews
 	def selectQmlStyle(self):
-		cfg.qmlFl = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a qml style"), "", "Style (*.qml)")
+		cfg.qmlFl = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a qml style"), "", "Style (*.qml)")
 		# write path to project istance
 		p = cfg.qgisCoreSCP.QgsProject.instance()
 		p.writeEntry("SemiAutomaticClassificationPlugin", "qmlfile", cfg.qmlFl)
 		cfg.uidc.qml_lineEdit.setText(cfg.qmlFl)
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "qml file: " + unicode(cfg.qmlFl))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "qml file: " + str(cfg.qmlFl))
 
 	# export signature list to file
 	def saveSignatureList(self, signatureFile):
@@ -724,7 +742,7 @@ class ClassificationDock:
 			root = cfg.ETSCP.Element("signaturelist")
 			MCID_LIST = cfg.classD.exportMCIDList()
 			root.set("MCID_LIST", str(MCID_LIST))
-			for k in cfg.signIDs.values():
+			for k in list(cfg.signIDs.values()):
 				sigItem = cfg.ETSCP.SubElement(root, "signature")
 				sigItem.set("ID", str(cfg.signIDs["ID_" + str(k)]))
 				mcIDField = cfg.ETSCP.SubElement(sigItem, "MACROCLASSID")
@@ -772,15 +790,15 @@ class ClassificationDock:
 			o.write(f)
 			o.close()
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures saved in: " + unicode(signatureFile))
-		except Exception, err:
+			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures saved in: " + str(signatureFile))
+		except Exception as err:
 			cfg.mx.msgErr15()
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		
 	def openSignatureList(self, path = None):
 		if path is None:
-			signFilePath = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a signature list file"), "", "Signature list file .slf (*.slf)")
+			signFilePath = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a signature list file"), "", "Signature list file .slf (*.slf)")
 		else:
 			signFilePath = path
 		if len(signFilePath) > 0:
@@ -790,11 +808,11 @@ class ClassificationDock:
 				signFile = signFilePath
 			self.openSignatureListFile(signFilePath)
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures opened: " + unicode(signFilePath))
+			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures opened: " + str(signFilePath))
 					
 	# open training file
 	def openTrainingFile(self):
-		scpPath = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a SCP training input"), "", "SCP file (*.scp)")
+		scpPath = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a SCP training input"), "", "SCP file (*.scp)")
 		if len(scpPath) > 0:
 			cfg.classD.openInput(scpPath)
 			
@@ -811,11 +829,11 @@ class ClassificationDock:
 			scpPath = cfg.utls.readProjectVariable("trainingLayer", "")
 		check = cfg.classD.openShapeFile(scpPath)
 		if check == "Yes":
-			cfg.utls.writeProjectVariable("trainingLayer", unicode(scpPath))
+			cfg.utls.writeProjectVariable("trainingLayer", str(scpPath))
 			cfg.scpFlPath = scpPath
-			cfg.uidc.trainingFile_lineEdit.setText(unicode(scpPath))
+			cfg.uidc.trainingFile_lineEdit.setText(str(scpPath))
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures opened: " + unicode(scpPath))
+			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures opened: " + str(scpPath))
 		else:
 			# shape layer
 			cfg.shpLay = None
@@ -829,7 +847,7 @@ class ClassificationDock:
 	# open input file
 	def openShapeFile(self, shapeFilePath):
 		# shapefile
-		zipName = cfg.osSCP.path.basename(unicode(shapeFilePath))
+		zipName = cfg.osSCP.path.basename(str(shapeFilePath))
 		name = zipName[:-4]
 		dT = cfg.utls.getTime()
 		cfg.inptDir = cfg.tmpDir + "/" + name + dT
@@ -843,11 +861,13 @@ class ClassificationDock:
 					if fileName.endswith(".shp"):
 						nm = fileName
 					try:
-						zipO = file(cfg.inptDir + "/" + fileName, "wb")
+						zipO = open(cfg.inptDir + "/" + fileName, "wb")
 						with zipF, zipO:
 							cfg.shutilSCP.copyfileobj(zipF, zipO)
-					except:
-						pass
+						zipO.close()
+					except Exception as err:
+						# logger
+						cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		except:
 			return "No"
 		# try remove SCP input
@@ -869,7 +889,7 @@ class ClassificationDock:
 				rEPSG = cfg.utls.getEPSGRaster(cfg.bndSetLst[0])
 			else:
 				rEPSG = cfg.utls.getEPSGRaster(cfg.imgSrc)
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			if cfg.bndSetPresent == "Yes" and cfg.imgNm == cfg.bndSetNm:
@@ -924,7 +944,7 @@ class ClassificationDock:
 		inptDir2 = cfg.inptDir
 		try:
 			cfg.inptDir = cfg.tmpDir + "/" + cfg.trnLay + dT
-		except Exception, err:
+		except Exception as err:
 			cfg.mx.msgErr59()
 			cfg.inptDir = cfg.tmpDir + "/" + dT
 			# logger
@@ -943,7 +963,7 @@ class ClassificationDock:
 	# check shapefile and fields
 	def checkFields(self, trainingLayer):
 		try:
-			if (trainingLayer.geometryType() == QGis.Polygon):
+			if (trainingLayer.wkbType() == QgsWkbTypes.Polygon):
 				# filter if shapefile has ID_class and ROI_info fields
 				f = trainingLayer.dataProvider().fields()
 				if f.indexFromName(cfg.fldID_class) > -1 and f.indexFromName(cfg.fldROI_info) > -1 and f.indexFromName(cfg.fldMacroID_class) > -1 and f.indexFromName(cfg.fldROIMC_info) > -1 and f.indexFromName(cfg.fldSCP_UID) > -1:
@@ -960,7 +980,7 @@ class ClassificationDock:
 							return "No"
 					else:
 						return "No"
-		except Exception, err:
+		except Exception as err:
 			return "No"
 			
 	# Add required fields if missing
@@ -1001,7 +1021,7 @@ class ClassificationDock:
 				for flName in zOpen.namelist():
 					zipF = zOpen.open(flName)
 					fileName = cfg.osSCP.path.basename(flName)
-					zipO = file(unzipDir + "/" + fileName, "wb")
+					zipO = open(unzipDir + "/" + fileName, "wb")
 					with zipF, zipO:
 						cfg.shutilSCP.copyfileobj(zipF, zipO)
 		except:
@@ -1044,7 +1064,7 @@ class ClassificationDock:
 				MCID_LIST = root.get("MCID_LIST")
 				MCIDLIST = eval(MCID_LIST)
 				cfg.classD.importMCIDList(MCIDLIST)
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			for child in root:
@@ -1117,7 +1137,7 @@ class ClassificationDock:
 			cfg.classD.ROIListTable(cfg.trnLay, cfg.uidc.signature_list_tableWidget)
 			# logger
 			if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " opened signature " + str(len(cfg.signIDs)))
-		except Exception, err:
+		except Exception as err:
 			cfg.classD.ROIListTable(cfg.trnLay, cfg.uidc.signature_list_tableWidget)
 			cfg.mx.msgErr16()
 			# logger
@@ -1125,7 +1145,7 @@ class ClassificationDock:
 			
 	# export signature to file
 	def exportSignatureFile(self):
-		signFile = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Export SCP training input"), "", "SCP file (*.scp)")
+		signFile = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Export SCP training input"), "", "SCP file (*.scp)")
 		if len(signFile) > 0:
 			# create shapefile
 			crs = cfg.utls.getCrs(cfg.shpLay)
@@ -1138,18 +1158,18 @@ class ClassificationDock:
 			f.append(QgsField(cfg.fldSCP_UID, cfg.QVariantSCP.String))
 			# open shapefile
 			if signFile.lower().endswith(".scp"):
-				sL = unicode(signFile)
+				sL = str(signFile)
 			else:
-				sL = unicode(signFile) + ".scp"
+				sL = str(signFile) + ".scp"
 			# shapefile
-			zipName = cfg.osSCP.path.basename(unicode(sL))
+			zipName = cfg.osSCP.path.basename(str(sL))
 			name = zipName[:-4]
 			dT = cfg.utls.getTime()
 			unzipDir = cfg.tmpDir + "/" + name + dT
 			shpF = unzipDir + "/" + name + ".shp"
 			sigFile = unzipDir + "/" + name + ".slf"
 			oDir = cfg.utls.makeDirectory(unzipDir)
-			QgsVectorFileWriter(unicode(shpF), "CP1250", f, QGis.WKBMultiPolygon , crs, "ESRI Shapefile")
+			QgsVectorFileWriter(str(shpF), "CP1250", f, QgsWkbTypes.MultiPolygon , crs, "ESRI Shapefile")
 			tSS = cfg.utls.addVectorLayer(shpF, name + dT, "ogr")
 			tW = cfg.uidc.signature_list_tableWidget
 			r = []
@@ -1179,11 +1199,11 @@ class ClassificationDock:
 			# create zip file
 			cfg.utls.zipDirectoryInFile(signFile, unzipDir)
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures exported in: " + unicode(signFile))
+			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures exported in: " + str(signFile))
 			
 	# export signature to shapefile
 	def exportSignatureShapefile(self):
-		signFile = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Export SCP training input"), "", "Shapefile (*.shp)")
+		signFile = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Export SCP training input"), "", "Shapefile (*.shp)")
 		if len(signFile) > 0:
 			# create shapefile
 			crs = cfg.utls.getCrs(cfg.shpLay)
@@ -1196,15 +1216,15 @@ class ClassificationDock:
 			f.append(QgsField(cfg.fldSCP_UID, cfg.QVariantSCP.String))
 			# open shapefile
 			if signFile.lower().endswith(".shp"):
-				sL = unicode(signFile)
+				sL = str(signFile)
 			else:
-				sL = unicode(signFile) + ".shp"
+				sL = str(signFile) + ".shp"
 			# shapefile
-			zipName = cfg.osSCP.path.basename(unicode(sL))
+			zipName = cfg.osSCP.path.basename(str(sL))
 			name = zipName[:-4]
 			dT = cfg.utls.getTime()
 			shpF = sL
-			QgsVectorFileWriter(unicode(shpF), "CP1250", f, QGis.WKBMultiPolygon , crs, "ESRI Shapefile")
+			QgsVectorFileWriter(str(shpF), "CP1250", f, QgsWkbTypes.MultiPolygon , crs, "ESRI Shapefile")
 			tSS = cfg.utls.addVectorLayer(shpF, name + dT, "ogr")
 			tW = cfg.uidc.signature_list_tableWidget
 			r = []
@@ -1227,15 +1247,15 @@ class ClassificationDock:
 			tSS.dataProvider().createSpatialIndex()
 			tSS.updateExtents()
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures exported in: " + unicode(signFile))
+			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures exported in: " + str(signFile))
 			
 	# save signature to file
 	def saveSignatureListToFile(self):
 		try:
 			cfg.classD.saveSignatureList(cfg.sigFile)
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures saved in: " + unicode(cfg.sigFile))
-		except Exception, err:
+			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " signatures saved in: " + str(cfg.sigFile))
+		except Exception as err:
 			cfg.mx.msgErr15()
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -1244,7 +1264,7 @@ class ClassificationDock:
 	def openLibraryFile(self, libraryFile):
 		try:
 			if cfg.bndSetUnit["UNIT"] != cfg.noUnit:
-				libFile = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a library file"), "", "SCP file (*.scp);;USGS library (*.asc);;ASTER library (*.txt);;CSV (*.csv)")
+				libFile = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a library file"), "", "SCP file (*.scp);;USGS library (*.asc);;ASTER library (*.txt);;CSV (*.csv)")
 				if len(libFile) > 0:
 					cfg.uiUtls.addProgressBar()
 					if libFile.lower().endswith(".asc"):
@@ -1257,10 +1277,10 @@ class ClassificationDock:
 						self.importSLCSignatureList(libFile, "Yes")
 					cfg.uiUtls.removeProgressBar()
 					# logger
-					cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " spectral library " + unicode(libFile))
+					cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " spectral library " + str(libFile))
 			else:
 				cfg.mx.msgWar8()
-		except Exception, err:
+		except Exception as err:
 			cfg.mx.msgWar8()
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -1273,7 +1293,7 @@ class ClassificationDock:
 			r.append(i.row())
 		if len(r) > 0:
 			v = list(set(r))
-			d = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Export the highlighted signatures to CSV library"))
+			d = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Export the highlighted signatures to CSV library"))
 			if len(d) > 0:
 				for b in v:
 					mID = tW.item(b, 1).text()
@@ -1286,7 +1306,7 @@ class ClassificationDock:
 					try:
 						l.write("wavelength;reflectance;standardDeviation;waveLengthUnit \n")
 						l.close()
-					except Exception, err:
+					except Exception as err:
 						cfg.mx.msgErr18()
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -1307,7 +1327,7 @@ class ClassificationDock:
 						line = str(wl) + ";" + str(vl) + ";" + str(sD) + ";" + str(u) + "\n"
 						try:
 							l.write(line)
-						except Exception, err:
+						except Exception as err:
 							cfg.mx.msgErr18()
 							# logger
 							cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -1346,7 +1366,7 @@ class ClassificationDock:
 		if len(v) == 0:
 			return 0
 		# ask for confirm
-		a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Calculate signatures"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Calculate signatures for highlighted items?"))
+		a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Calculate signatures"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Calculate signatures for highlighted items?"))
 		if a == "Yes":
 			cfg.uiUtls.addProgressBar()
 			progresStep = 100 / len(v)
@@ -1355,10 +1375,10 @@ class ClassificationDock:
 				progress = progress * progresStep
 				id = tW.item(x, 6).text()
 				# if ROI
-				if str(id) in cfg.ROI_SCP_UID.values():
+				if str(id) in list(cfg.ROI_SCP_UID.values()):
 					rId = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(id))
 					cfg.utls.calculateSignature(cfg.shpLay, cfg.rstrNm, rId, cfg.ROI_MC_ID[id], cfg.ROI_MC_Info[id], cfg.ROI_C_ID[id], cfg.ROI_C_Info[id], progress, progresStep, "No", "No", id)
-				if id in cfg.signPlotIDs.values():
+				if id in list(cfg.signPlotIDs.values()):
 					cfg.classD.sigListToPlot(id)
 					cfg.spSigPlot.signatureListPlotTable(cfg.uisp.signature_list_plot_tableWidget)
 			cfg.classD.ROIListTable(cfg.trnLay, cfg.uidc.signature_list_tableWidget)
@@ -1372,7 +1392,7 @@ class ClassificationDock:
 			r.append(i.row())
 		if len(set(r)) > 1:
 			# ask for confirm
-			a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Merge signatures"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Merge highlighted signatures?"))
+			a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Merge signatures"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Merge highlighted signatures?"))
 			if a == "Yes":
 				cfg.uiUtls.addProgressBar()
 				v = list(set(r))
@@ -1389,14 +1409,14 @@ class ClassificationDock:
 				for x in v:
 					id = tW.item(x, 6).text()
 					# if ROI
-					if str(id) in cfg.ROI_SCP_UID.values():
+					if str(id) in list(cfg.ROI_SCP_UID.values()):
 						ifd = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(id))
 						ids.append(ifd[0])
 						ROIcheck.append(1)
 					else:
 						ROIcheck.append(0)
 					# if not signatue
-					if str(id) not in cfg.signIDs.values():
+					if str(id) not in list(cfg.signIDs.values()):
 						rId = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(id))
 						cfg.utls.calculateSignature(cfg.shpLay, cfg.rstrNm, rId, cfg.ROI_MC_ID[id], cfg.ROI_MC_Info[id], cfg.ROI_C_ID[id], cfg.ROI_C_Info[id], None, None, "No", "No", id)
 					if len(wl) == 0:
@@ -1493,7 +1513,7 @@ class ClassificationDock:
 		tW = cfg.uidc.signature_list_tableWidget
 		if len(tW.selectedIndexes()) > 0:
 			# ask for confirm
-			a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Delete signatures"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to delete highlighted ROIs and signatures?"))
+			a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Delete signatures"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to delete highlighted ROIs and signatures?"))
 			if a == "Yes":
 				r = []
 				for i in tW.selectedIndexes():
@@ -1502,9 +1522,9 @@ class ClassificationDock:
 				ids = []
 				for x in v:
 					id = tW.item(x, 6).text()
-					if id in cfg.signIDs.values():
+					if id in list(cfg.signIDs.values()):
 						cfg.classD.deleteSignatureByID(id)
-					if id in cfg.ROI_SCP_UID.values():
+					if id in list(cfg.ROI_SCP_UID.values()):
 						rId = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(id))
 						for rI in rId:
 							ids.append(rI)
@@ -1560,8 +1580,8 @@ class ClassificationDock:
 			for x in v:
 				progress = progress * progresStep
 				id = tW.item(x, 6).text()
-				if id in cfg.signIDs.values():
-					if id not in cfg.signPlotIDs.values():
+				if id in list(cfg.signIDs.values()):
+					if id not in list(cfg.signPlotIDs.values()):
 						cfg.classD.sigListToPlot(id)
 				else:
 					rId = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(id))
@@ -1590,7 +1610,7 @@ class ClassificationDock:
 			for x in v:
 				progress = progress * progresStep
 				id = tW.item(x, 6).text()
-				if str(id) in cfg.ROI_SCP_UID.values():
+				if str(id) in list(cfg.ROI_SCP_UID.values()):
 					h = cfg.utls.calculateScatterPlot(cfg.shpLay, cfg.fldSCP_UID, str(id))
 					# add ROI to scatter plot table
 					cfg.scaPlT.sigListToScatterPlot(id, h, [cfg.scatterBandX, cfg.scatterBandY])
@@ -1647,7 +1667,7 @@ class ClassificationDock:
 					cfg.ROI_C_Info[SCP_UID] = str(f[cfg.fldROI_info])
 					cfg.ROI_Count[SCP_UID]= str(i)
 					cfg.ROI_ShapeID[SCP_UID]= str(id)
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					cfg.mx.msg3()
@@ -1669,7 +1689,7 @@ class ClassificationDock:
 		try:
 			for k in sorted(cfg.ROI_SCP_UID.values()):
 				cfg.utls.insertTableRow(l, b, 20)	
-				if str(k) in cfg.signIDs.values():
+				if str(k) in list(cfg.signIDs.values()):
 					cfg.utls.addTableItem(l, "checkbox", b, 0, "Yes", None, cfg.signList["CHECKBOX_" + str(k)])
 					cfg.utls.addTableItem(l, cfg.ROISigTypeNm, b, 1, "No")
 					cfg.utls.addTableItem(l, "", b, 5, "Yes", cfg.signList["COLOR_" + str(k)])
@@ -1704,12 +1724,12 @@ class ClassificationDock:
 				cfg.utls.addTableItem(l, str(cfg.ROI_C_Info[k]), b, 4, "Yes", None, None, str(cfg.ROI_C_Info[k]))
 				cfg.utls.addTableItem(l, str(k), b, 6)
 				b = b +1
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msgErr43()
 		for k in sorted(cfg.signIDs.values()):
-			if str(k) not in cfg.ROI_SCP_UID.values():
+			if str(k) not in list(cfg.ROI_SCP_UID.values()):
 				cfg.utls.insertTableRow(l, b, 20)	
 				cfg.utls.addTableItem(l, "checkbox", b, 0, "Yes", None, cfg.signList["CHECKBOX_" + str(k)])
 				cfg.utls.addTableItem(l, cfg.SIGTypeNm, b, 1, "No")
@@ -1743,7 +1763,7 @@ class ClassificationDock:
 			i = cfg.utls.selectLayerbyName(cfg.rstrNm, "Yes")
 			try:
 				iB = i.bandCount()
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				iB = 1
@@ -1825,9 +1845,9 @@ class ClassificationDock:
 			try:
 				l = cfg.utls.getFieldAttributeList(cfg.shpLay, cfg.fldROI_info)
 				# class names
-				cfg.cmplClsNm = cfg.QtGuiSCP.QCompleter(l)
+				cfg.cmplClsNm = cfg.QtWidgetsSCP.QCompleter(l)
 				cfg.uidc.ROI_Class_line.setCompleter(cfg.cmplClsNm)
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 
@@ -1855,9 +1875,9 @@ class ClassificationDock:
 				MCID_LIST = cfg.classD.exportMCIDList()
 				l = [MC[1] for MC in MCID_LIST]
 				# class names
-				cfg.cmplMClsNm = cfg.QtGuiSCP.QCompleter(l)
+				cfg.cmplMClsNm = cfg.QtWidgetsSCP.QCompleter(l)
 				cfg.uidc.ROI_Macroclass_line.setCompleter(cfg.cmplMClsNm)
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		
@@ -1878,7 +1898,7 @@ class ClassificationDock:
 					cfg.utls.setTableItem(tW, row, column, str(v))
 					cfg.mx.msg17()
 				cfg.signList["MACROCLASSID_" + str(id)] = v
-				if id in cfg.ROI_SCP_UID.values():
+				if id in list(cfg.ROI_SCP_UID.values()):
 					cfg.ROI_MC_ID[id] = v
 					rId = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(id))
 					for rI in rId:
@@ -1893,7 +1913,7 @@ class ClassificationDock:
 					cfg.utls.setTableItem(tW, row, column, str(v))
 					cfg.mx.msg17()
 				cfg.signList["CLASSID_" + str(id)] = v
-				if id in cfg.ROI_SCP_UID.values():
+				if id in list(cfg.ROI_SCP_UID.values()):
 					cfg.ROI_C_ID[id] = v
 					rId = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(id))
 					for rI in rId:
@@ -1904,7 +1924,7 @@ class ClassificationDock:
 			iTxt2 = tW.item(row, column).text().encode('ascii','replace')
 			cfg.signList["CLASSINFO_" + str(id)] = iTxt2
 			cfg.utls.setTableItem(tW, row, column, iTxt2)
-			if id in cfg.ROI_SCP_UID.values():
+			if id in list(cfg.ROI_SCP_UID.values()):
 				cfg.ROI_C_Info[id] = iTxt2
 				rId = cfg.utls.getIDByAttributes(cfg.shpLay, cfg.fldSCP_UID, str(id))
 				for rI in rId:
@@ -1961,7 +1981,7 @@ class ClassificationDock:
 		for b in range(0, c):
 			mID = tW.item(b, 0).text()
 			mC = tW.item(b, 1).text()
-			c = tW.item(b, 2).backgroundColor()
+			c = tW.item(b, 2).background().color() 
 			s = []
 			s.append(mID)
 			s.append(mC)
@@ -1989,7 +2009,7 @@ class ClassificationDock:
 		for b in range(0, c):
 			mID = tW.item(b, 0).text()
 			mC = tW.item(b, 1).text()
-			c = tW.item(b, 2).backgroundColor()
+			c = tW.item(b, 2).background().color() 
 			s = []
 			s.append(mID)
 			s.append(mC)
@@ -2058,10 +2078,10 @@ class ClassificationDock:
 		l = cfg.utls.selectLayerbyName(cfg.trnLay)
 		if l is not None:
 			id = cfg.uidc.signature_list_tableWidget.item(index.row(), 6).text()
-			if id in cfg.ROI_SCP_UID.values():
+			if id in list(cfg.ROI_SCP_UID.values()):
 				rId = cfg.utls.getIDByAttributes(l, cfg.fldSCP_UID, str(id))
 				cfg.utls.zoomToSelected(l, rId)
-				cfg.lgnd.setLayerVisible(l, True)
+				cfg.utls.setLayerVisible(l, True)
 				cfg.utls.moveLayerTop(l)
 
 	# Activate signature calculation
@@ -2085,7 +2105,7 @@ class ClassificationDock:
 		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), ">>> create input click")
 		try:
 			if cfg.rstrNm is not None:
-				sF = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Create SCP training input"), "", "SCP file (*.scp)")
+				sF = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Create SCP training input"), "", "SCP file (*.scp)")
 				if len(sF) > 0:
 					try:
 						# band set
@@ -2107,17 +2127,17 @@ class ClassificationDock:
 						f.append(QgsField(cfg.fldSCP_UID, cfg.QVariantSCP.String))
 						# open shapefile
 						if sF.lower().endswith(".scp"):
-							sL = unicode(sF)
+							sL = str(sF)
 						else:
-							sL = unicode(sF) + ".scp"
+							sL = str(sF) + ".scp"
 						# shapefile
-						zipName = cfg.osSCP.path.basename(unicode(sL))
+						zipName = cfg.osSCP.path.basename(str(sL))
 						name = zipName[:-4]
 						dT = cfg.utls.getTime()
 						unzipDir = cfg.tmpDir + "/" + name + dT
 						shpF = unzipDir + "/" + name + ".shp"
 						oDir = cfg.utls.makeDirectory(unzipDir)
-						QgsVectorFileWriter(unicode(shpF), "CP1250", f, QGis.WKBMultiPolygon , crs, "ESRI Shapefile")
+						QgsVectorFileWriter(str(shpF), "CP1250", f, QgsWkbTypes.MultiPolygon , crs, "ESRI Shapefile")
 						sigFile = unzipDir + "/" + name + ".slf"
 						cfg.classD.saveSignatureList(sigFile)
 						# create zip file
@@ -2125,8 +2145,8 @@ class ClassificationDock:
 						# open input
 						cfg.classD.openInput(sL)
 						# logger
-						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "<<< SCP created: " + "\"" + unicode(sL) + "\"")
-					except Exception, err:
+						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "<<< SCP created: " + "\"" + str(sL) + "\"")
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						cfg.ipt.refreshRasterLayer()
@@ -2136,7 +2156,7 @@ class ClassificationDock:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "<<< create SCP fail: no raster")
 				cfg.ipt.refreshRasterLayer()
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msg4()
@@ -2151,8 +2171,8 @@ class ClassificationDock:
 			progressbar = "Yes"
 		# check if layer was removed ## there is an issue if the removed layer was already saved in the project ##
 		try:
-			sN = unicode(cfg.shpLay.name())
-		except Exception, err:
+			sN = str(cfg.shpLay.name())
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msg3()
@@ -2185,7 +2205,7 @@ class ClassificationDock:
 				# set macroclass ID attribute
 				fdMID = cfg.utls.fieldID(cfg.shpLay, str(cfg.fldMacroID_class))
 				cfg.shpLay.changeAttributeValue(self.ROILastID, fdMID, cfg.ROIMacroID)
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				cfg.shpLay.startEditing()	
@@ -2193,7 +2213,7 @@ class ClassificationDock:
 				cfg.shpLay.commitChanges()
 				cfg.shpLay.dataProvider().createSpatialIndex()
 				cfg.uidc.undo_save_Button.setEnabled(False)
-				a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Add required fds"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "It appears that the shapefile ") + cfg.shpLay.name() + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", " is missing some fields that are required for the signature calculation. \nDo you want to add the required fields to this shapefile?"))
+				a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Add required fds"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "It appears that the shapefile ") + cfg.shpLay.name() + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", " is missing some fields that are required for the signature calculation. \nDo you want to add the required fields to this shapefile?"))
 				if a == "Yes":
 					fds = []
 					fds.append(QgsField(cfg.fldMacroID_class, cfg.QVariantSCP.Int))	
@@ -2232,7 +2252,7 @@ class ClassificationDock:
 			if progressbar == "Yes":
 				cfg.uiUtls.updateBar(40)
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "roi: " + str(cfg.ROIID) + ", " + str(cfg.ROIInfo) + " saved to shapefile: " + unicode(cfg.shpLay.name()))
+			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "roi: " + str(cfg.ROIID) + ", " + str(cfg.ROIInfo) + " saved to shapefile: " + str(cfg.shpLay.name()))
 			# calculate signature if checkbox is yes
 			if cfg.uidc.signature_checkBox.isChecked() is True:
 				if progressbar == "Yes":
@@ -2265,7 +2285,7 @@ class ClassificationDock:
 		# check if layer was removed ## there is an issue if the removed layer was already saved in the project ##
 		try:
 			s = str(cfg.shpLay.name())
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msg3()
@@ -2277,7 +2297,7 @@ class ClassificationDock:
 			cfg.mx.msg6()
 		else:
 			# ask for confirm
-			a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Undo save ROI"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to delete the last saved ROI?"))
+			a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Undo save ROI"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to delete the last saved ROI?"))
 			if a == "Yes":
 				f = cfg.utls.getFeaturebyID(cfg.shpLay, self.ROILastID)
 				SCP_UID  = str(f[cfg.fldSCP_UID])

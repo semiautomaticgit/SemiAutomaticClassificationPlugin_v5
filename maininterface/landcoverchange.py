@@ -45,7 +45,7 @@ class LandCoverChange:
 	def classificationReferenceLayerName(self):
 		cfg.refClssfctnNm = cfg.ui.classification_reference_name_combo.currentText()
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "reference classification name: " + unicode(cfg.refClssfctnNm))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "reference classification name: " + str(cfg.refClssfctnNm))
 					
 	# start land cover change calculation
 	def landCoverChangeAction(self):			
@@ -59,7 +59,7 @@ class LandCoverChange:
 			try:
 				refRstrSrc = refRstr.source()
 				rstrCheck = "Yes"
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				rstrCheck = "No"
@@ -67,7 +67,7 @@ class LandCoverChange:
 			try:
 				newRstrSrc = newRstr.source()
 				rstrCheck = "Yes"
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				rstrCheck = "No"
@@ -81,7 +81,7 @@ class LandCoverChange:
 		# check if numpy is updated
 		try:
 			cfg.np.count_nonzero([1,1,0])
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msgErr26()
@@ -99,7 +99,7 @@ class LandCoverChange:
 				cfg.mx.msg9()
 			else:
 				if batch == "No":
-					rstrOut = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save land cover change raster output"), "", "*.tif")
+					rstrOut = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save land cover change raster output"), "", "*.tif")
 				else:
 					rstrOut = rasterOutput
 				if len(rstrOut) > 0:
@@ -112,7 +112,7 @@ class LandCoverChange:
 					chngRstPath = chngRstPath.replace('//', '/')
 					tblOut = cfg.osSCP.path.dirname(chngRstPath) + "/" + cfg.osSCP.path.basename(chngRstPath)
 					tblOut = cfg.osSCP.path.splitext(tblOut)[0] + ".csv"
-					if unicode(chngRstPath).endswith(".tif"):
+					if str(chngRstPath).endswith(".tif"):
 						pass
 					else:
 						chngRstPath = chngRstPath + ".tif"
@@ -171,7 +171,7 @@ class LandCoverChange:
 					variableList = [["im1", "a"], ["im2", "b"]]
 					o = cfg.utls.processRaster(rD, bL, None, "No", cfg.utls.bandCalculationMultipleWhere, None, oMR, None, None, 0, None, cfg.NoDataVal, "No", e, variableList, "No")
 					# logger
-					cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "change raster output: " + unicode(chngRstPath))
+					cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "change raster output: " + str(chngRstPath))
 					# close GDAL rasters
 					for b in range(0, len(oMR)):
 						oMR[b] = None
@@ -182,7 +182,7 @@ class LandCoverChange:
 						try:
 							cfg.utls.GDALCopyRaster(tPMD2, chngRstPath, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 							cfg.osSCP.remove(tPMD2)
-						except Exception, err:
+						except Exception as err:
 							cfg.shutilSCP.copy(tPMD2, chngRstPath)
 							cfg.osSCP.remove(tPMD2)
 							# logger
@@ -195,11 +195,7 @@ class LandCoverChange:
 						l = open(tblOut, 'w')
 					except:
 						return "No"
-					t = cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'ChangeCode') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'ReferenceClass') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'NewClass') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'PixelSum') + str("\n")
-					try:
-						t = t.encode(cfg.sysSCP.getfilesystemencoding())
-					except:
-						pass
+					t = cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'ChangeCode') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'ReferenceClass') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'NewClass') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'PixelSum') + str("\n")
 					l.write(t)
 					# change stats
 					rDC = cfg.gdalSCP.Open(chngRstPath, cfg.gdalSCP.GA_ReadOnly)
@@ -225,12 +221,12 @@ class LandCoverChange:
 						if cfg.osSCP.path.isfile(tblOut):
 							changeTxt = f.read()
 							cfg.ui.change_textBrowser.setText(str(changeTxt))
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					# add raster to layers
-					cfg.iface.addRasterLayer(unicode(chngRstPath), unicode(cfg.osSCP.path.basename(chngRstPath)))
-					rstr = cfg.utls.selectLayerbyName(unicode(cfg.osSCP.path.basename(chngRstPath)), "Yes")
+					cfg.iface.addRasterLayer(str(chngRstPath), str(cfg.osSCP.path.basename(chngRstPath)))
+					rstr = cfg.utls.selectLayerbyName(str(cfg.osSCP.path.basename(chngRstPath)), "Yes")
 					cfg.utls.rasterSymbolGeneric(rstr)	
 					cfg.uiUtls.updateBar(100)
 					if batch == "No":
@@ -254,11 +250,11 @@ class LandCoverChange:
 	def newClassificationLayerName(self):
 		cfg.newClssfctnNm = cfg.ui.new_classification_name_combo.currentText()
 		# logger
-		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "reference classification name: " + unicode(cfg.newClssfctnNm))
+		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "reference classification name: " + str(cfg.newClssfctnNm))
 	
 	# refresh reference classification name
 	def refreshClassificationReferenceLayer(self):
-		ls = cfg.lgnd.layers()
+		ls = cfg.qgisCoreSCP.QgsProject.instance().mapLayers().values()
 		cfg.ui.classification_reference_name_combo.clear()
 		# reference classification name
 		cfg.refClssfctnNm = None
@@ -271,7 +267,7 @@ class LandCoverChange:
 	
 	# refresh new classification name
 	def refreshNewClassificationLayer(self):
-		ls = cfg.lgnd.layers()
+		ls = cfg.qgisCoreSCP.QgsProject.instance().mapLayers().values()
 		cfg.ui.new_classification_name_combo.clear()
 		# new classification name
 		cfg.newClssfctnNm = None

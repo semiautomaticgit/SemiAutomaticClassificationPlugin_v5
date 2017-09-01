@@ -189,17 +189,17 @@ class DownloadMODISImages:
 				imageFindList.append(m.lower())
 		try:
 			rubbRect = QgsRectangle(float(cfg.ui.UX_lineEdit_6.text()), float(cfg.ui.UY_lineEdit_6.text()), float(cfg.ui.LX_lineEdit_6.text()), float(cfg.ui.LY_lineEdit_6.text()))
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msg23()
 			return "No"
 		try:
 			cfg.uiUtls.addProgressBar()
-			cfg.QtGuiSCP.qApp.processEvents()
+			cfg.QtWidgetsSCP.qApp.processEvents()
 			tW = cfg.ui.modis_images_tableWidget
 			tW.setSortingEnabled(False)
-			cfg.uiUtls.updateBar(30, cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
+			cfg.uiUtls.updateBar(30, cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
 			# issue with cloud cover search
 			#searchUrl = 'https://cmr.earthdata.nasa.gov/search/granules.echo10?bounding_box=' + cfg.ui.UX_lineEdit_6.text() + '%2C' + cfg.ui.LY_lineEdit_6.text() + '%2C' + cfg.ui.LX_lineEdit_6.text() + '%2C' + cfg.ui.UY_lineEdit_6.text() + '&echo_collection_id=' + NASAcollection + '&temporal=' + dateFrom + '%2C' + dateTo + 'T23%3A59%3A59.000Z&cloud_cover=0,' + str(maxCloudCover) + '&sort_key%5B%5D=-start_date&page_size=' + str(resultNum) + '&pretty=true'
 			searchUrl = 'https://cmr.earthdata.nasa.gov/search/granules.echo10?bounding_box=' + cfg.ui.UX_lineEdit_6.text() + '%2C' + cfg.ui.LY_lineEdit_6.text() + '%2C' + cfg.ui.LX_lineEdit_6.text() + '%2C' + cfg.ui.UY_lineEdit_6.text() + '&echo_collection_id=' + NASAcollection + '&temporal=' + dateFrom + '%2C' + dateTo + 'T23%3A59%3A59.000Z&sort_key%5B%5D=-start_date&page_size=' + str(resultNum) + '&pretty=true'
@@ -213,7 +213,7 @@ class DownloadMODISImages:
 			page = 0
 			for entry in entries:
 				page = page + 1
-				cfg.uiUtls.updateBar(30 + int(page * 70 / pages), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
+				cfg.uiUtls.updateBar(30 + int(page * 70 / pages), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
 				gId = entry.getElementsByTagName("ProducerGranuleId")[0]
 				imgID = gId.firstChild.data
 				if imgID not in imgIDList:
@@ -248,7 +248,7 @@ class DownloadMODISImages:
 					DayNightFlag = entry.getElementsByTagName("DayNightFlag")[0]
 					dayNight = DayNightFlag.firstChild.data
 					listImgID.append([imgID, imgDate, cloudCover, imgDispID, dayNight, lon, lat, imgPreview.replace("http:", "https:")])
-			cfg.uiUtls.updateBar(100, cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
+			cfg.uiUtls.updateBar(100, cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
 			c = tW.rowCount()
 			for imID in listImgID:
 				if len(imageFindList) > 0:
@@ -288,7 +288,7 @@ class DownloadMODISImages:
 			c = tW.rowCount()
 			if c == 0:
 				cfg.mx.msg21()
-		except Exception, err:
+		except Exception as err:
 			cfg.mx.msgErr39()
 			cfg.uiUtls.removeProgressBar()
 			# logger
@@ -319,7 +319,7 @@ class DownloadMODISImages:
 				if cfg.osSCP.path.isfile(cfg.tmpDir + "//" + imgDispID + ".vrt"):
 					l = cfg.utls.selectLayerbyName(imgDispID + ".vrt")
 					if l is not None:		
-						cfg.lgnd.setLayerVisible(l, True)
+						cfg.utls.setLayerVisible(l, True)
 						cfg.utls.moveLayerTop(l)
 					else:
 						r = cfg.utls.addRasterLayer(cfg.tmpDir + "//" + imgDispID + ".vrt", imgDispID + ".vrt")
@@ -338,10 +338,9 @@ class DownloadMODISImages:
 		
 	# download thumbnail
 	def downloadThumbnail(self, imgID, imgDispID, row, min_lat, min_lon, max_lat, max_lon, imageJPG, progress = None):
-		#check = cfg.utls.downloadFile(imageJPG, cfg.tmpDir + "//" + imgDispID + "_thumb.jpg", imgDispID + "_thumb.jpg", progress)
 		user = cfg.ui.user_usgs_lineEdit_3.text()
 		password =cfg.ui.password_usgs_lineEdit_3.text()
-		check = cfg.utls.passwordConnect(user, password, imageJPG, 'urs.earthdata.nasa.gov', cfg.tmpDir + "//" + imgDispID + "_thumb.jpg", progress, "No")
+		check = cfg.utls.passwordConnectPython(user, password, imageJPG, 'urs.earthdata.nasa.gov', cfg.tmpDir + "//" + imgDispID + "_thumb.jpg", progress, "No")
 		if check == "Yes":
 			UL1 = QgsPoint(float(min_lon), float(max_lat))
 			LR1 = QgsPoint(float(max_lon), float(min_lat))
@@ -356,12 +355,12 @@ class DownloadMODISImages:
 					out, err = sP.communicate()
 					sP.stdout.close()
 					if len(err) > 0:
-						cfg.mx.msgBarError(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Error"), err)
+						cfg.mx.msgBarError(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Error"), err)
 						st = "Yes"
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " GDAL error:: " + str(err) )
 				# in case of errors
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					sP = cfg.subprocessSCP.Popen(a, shell=True)
@@ -383,7 +382,7 @@ class DownloadMODISImages:
 		tW = cfg.ui.modis_images_tableWidget
 		c = tW.rowCount()
 		if c > 0:
-			d = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Download the images in the table (requires internet connection)"))
+			d = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Download the images in the table (requires internet connection)"))
 			if len(d) > 0:
 				self.downloadMODISImages(d)
 		
@@ -441,7 +440,7 @@ class DownloadMODISImages:
 						for f in cfg.osSCP.listdir(d):
 							if f.lower().endswith(".tif"):
 								r = cfg.utls.addRasterLayer(d + "/" + f, f)
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.uiUtls.removeProgressBar()
@@ -474,8 +473,7 @@ class DownloadMODISImages:
 			password =cfg.ui.password_usgs_lineEdit_3.text()
 			try:
 				imgID = imageDisplayID + ".hdf"
-				#check = cfg.utls.passwordConnectPython(user, password, url, 'urs.earthdata.nasa.gov', cfg.tmpDir + "//" + imgID, progress)
-				check = cfg.utls.passwordConnect(user, password, url, 'urs.earthdata.nasa.gov', cfg.tmpDir + "//" + imgID, progress, "No", "Yes")
+				check = cfg.utls.passwordConnectPython(user, password, url, 'urs.earthdata.nasa.gov', cfg.tmpDir + "//" + imgID, progress)
 				if str(check) == 'Cancel action':
 					return check
 				if cfg.osSCP.path.getsize(cfg.tmpDir + "//" + imgID) > 10000:
@@ -484,7 +482,7 @@ class DownloadMODISImages:
 				else:
 					cfg.mx.msgErr55(imgID)
 					return "No"
-			except Exception, err:
+			except Exception as err:
 				cfg.mx.msgErr55(imgID)
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -495,7 +493,7 @@ class DownloadMODISImages:
 		tW = cfg.ui.modis_images_tableWidget
 		c = tW.rowCount()
 		if c > 0:
-			d = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Export download links"), "", "*.txt")
+			d = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Export download links"), "", "*.txt")
 			if len(d) > 0:
 				links = self.downloadMODISImages("No", "Yes")
 				if links == "No":
@@ -510,7 +508,7 @@ class DownloadMODISImages:
 	# clear table
 	def clearTable(self):
 		# ask for confirm
-		a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Reset signature list"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the table?"))
+		a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Reset signature list"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the table?"))
 		if a == "Yes":
 			tW = cfg.ui.modis_images_tableWidget
 			cfg.utls.clearTable(tW)

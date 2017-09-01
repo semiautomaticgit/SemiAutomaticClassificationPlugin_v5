@@ -185,17 +185,17 @@ class DownloadLandsatImages:
 				imageFindList.append(m.lower())
 		try:
 			rubbRect = QgsRectangle(float(cfg.ui.UX_lineEdit_3.text()), float(cfg.ui.UY_lineEdit_3.text()), float(cfg.ui.LX_lineEdit_3.text()), float(cfg.ui.LY_lineEdit_3.text()))
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msg23()
 			return "No"
 		try:
 			cfg.uiUtls.addProgressBar()
-			cfg.QtGuiSCP.qApp.processEvents()
+			cfg.QtWidgetsSCP.qApp.processEvents()
 			tW = cfg.ui.landsat_images_tableWidget
 			tW.setSortingEnabled(False)
-			cfg.uiUtls.updateBar(30, cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
+			cfg.uiUtls.updateBar(30, cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
 			# cloud cover returns 0 results
 			# without cloud cover
 			searchUrl = 'https://cmr.earthdata.nasa.gov/search/granules.echo10?bounding_box=' + cfg.ui.UX_lineEdit_3.text() + '%2C' + cfg.ui.LY_lineEdit_3.text() + '%2C' + cfg.ui.LX_lineEdit_3.text() + '%2C' + cfg.ui.UY_lineEdit_3.text() + '&echo_collection_id=' + NASAcollection + '&temporal=' + dateFrom + '%2C' + dateTo + 'T23%3A59%3A59.000Z&sort_key%5B%5D=-start_date&page_size=' + str(resultNum) + '&pretty=true'
@@ -209,7 +209,7 @@ class DownloadLandsatImages:
 			page = 0
 			for entry in entries:
 				page = page + 1
-				cfg.uiUtls.updateBar(30 + int(page * 70 / pages), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
+				cfg.uiUtls.updateBar(30 + int(page * 70 / pages), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
 				gId = entry.getElementsByTagName("GranuleUR")[0]
 				imgID = gId.firstChild.data
 				if imgID not in imgIDList:
@@ -283,7 +283,7 @@ class DownloadLandsatImages:
 			c = tW.rowCount()
 			if c == 0:
 				cfg.mx.msg21()
-		except Exception, err:
+		except Exception as err:
 			cfg.mx.msgErr39()
 			cfg.uiUtls.removeProgressBar()
 			# logger
@@ -314,7 +314,7 @@ class DownloadLandsatImages:
 				if cfg.osSCP.path.isfile(cfg.tmpDir + "//" + imgID + ".vrt"):
 					l = cfg.utls.selectLayerbyName(imgID + ".vrt")
 					if l is not None:		
-						cfg.lgnd.setLayerVisible(l, True)
+						cfg.utls.setLayerVisible(l, True)
 						cfg.utls.moveLayerTop(l)
 					else:
 						r = cfg.utls.addRasterLayer(cfg.tmpDir + "//" + imgID + ".vrt", imgID + ".vrt")
@@ -370,12 +370,12 @@ class DownloadLandsatImages:
 					out, err = sP.communicate()
 					sP.stdout.close()
 					if len(err) > 0:
-						cfg.mx.msgBarError(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Error"), err)
+						cfg.mx.msgBarError(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Error"), err)
 						st = "Yes"
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " GDAL error:: " + str(err) )
 				# in case of errors
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					sP = cfg.subprocessSCP.Popen(a, shell=True)
@@ -397,7 +397,7 @@ class DownloadLandsatImages:
 		tW = cfg.ui.landsat_images_tableWidget
 		c = tW.rowCount()
 		if c > 0:
-			d = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Download the images in the table (requires internet connection)"))
+			d = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Download the images in the table (requires internet connection)"))
 			if len(d) > 0:
 				self.downloadLandsatImages(d)
 		
@@ -503,7 +503,7 @@ class DownloadLandsatImages:
 						for f in cfg.osSCP.listdir(d):
 							if f.lower().endswith(".tif"):
 								r = cfg.utls.addRasterLayer(d + "/" + f, f)
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.uiUtls.removeProgressBar()
@@ -520,7 +520,7 @@ class DownloadLandsatImages:
 			password =cfg.ui.password_usgs_lineEdit.text()
 			try:
 				imgID = imageID + ".tar.gz"
-				check = cfg.utls.downloadFileUSGS(user, password, 'https://ers.cr.usgs.gov/login', url, cfg.tmpDir + "//" + imgID, imgID, progress, "Yes")
+				check = cfg.utls.downloadFileUSGS(user, password, 'https://ers.cr.usgs.gov', url, cfg.tmpDir + "//" + imgID, imgID, progress, "Yes")
 				if str(check) == 'Cancel action':
 					return check
 				if cfg.osSCP.path.getsize(cfg.tmpDir + "//" + imgID) > 10000:
@@ -532,7 +532,7 @@ class DownloadLandsatImages:
 				else:
 					cfg.mx.msgErr55(imgID)
 					return "No"
-			except Exception, err:
+			except Exception as err:
 				cfg.mx.msgErr50(str(err))
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -568,7 +568,7 @@ class DownloadLandsatImages:
 				else:
 					cfg.mx.msgErr42(imageID)
 					return "No"
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				return "No"
@@ -578,7 +578,7 @@ class DownloadLandsatImages:
 		tW = cfg.ui.landsat_images_tableWidget
 		c = tW.rowCount()
 		if c > 0:
-			d = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Export download links"), "", "*.txt")
+			d = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Export download links"), "", "*.txt")
 			if len(d) > 0:
 				links = self.downloadLandsatImages("No", "Yes")
 				if links == "No":
@@ -606,7 +606,7 @@ class DownloadLandsatImages:
 	# clear table
 	def clearTable(self):
 		# ask for confirm
-		a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Reset signature list"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the table?"))
+		a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Reset signature list"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the table?"))
 		if a == "Yes":
 			tW = cfg.ui.landsat_images_tableWidget
 			cfg.utls.clearTable(tW)

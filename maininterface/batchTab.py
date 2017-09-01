@@ -98,7 +98,7 @@ class BatchTab:
 						cfg.ui.toolButton_run_batch.setEnabled(True)
 						if check == "No":
 							checkO = "No"
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						checkO = "No"
@@ -126,14 +126,14 @@ class BatchTab:
 						
 	# import batch from text file
 	def importBatch(self):
-		file = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a batch file"), "", "txt (*.txt)")
+		file = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a batch file"), "", "txt (*.txt)")
 		if len(file) > 0:
 			text = open(file, 'r').read()
 			cfg.ui.plainTextEdit_batch.setPlainText(text)
 			
 	# export batch to text file
 	def exportBatch(self):
-		file = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save the batch to file"), "", "txt (*.txt)")
+		file = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save the batch to file"), "", "txt (*.txt)")
 		if len(file) > 0:
 			if file.lower().endswith(".txt"):
 				pass
@@ -233,7 +233,7 @@ class BatchTab:
 				g = cfg.reSCP.findall('[\'](.*?)[\']',pSplitX.replace('\\', '/'))
 				cfg.ui.label_26.setText(g[0])
 				inputDir = "'" + g[0] + "'"
-				if len(g[0]) > 0 and cfg.QDirSCP(unicode(g[0])).exists():
+				if len(g[0]) > 0 and cfg.QDirSCP(str(g[0])).exists():
 					pass
 				else:
 					l = cfg.ui.landsat_tableWidget
@@ -489,7 +489,7 @@ class BatchTab:
 				g = cfg.reSCP.findall('[\'](.*?)[\']',pSplitX.replace('\\', '/'))
 				cfg.ui.S2_label_86.setText(g[0])
 				inputDir = "'" + g[0] + "'"
-				if len(g[0]) > 0 and cfg.QDirSCP(unicode(g[0])).exists():
+				if len(g[0]) > 0 and cfg.QDirSCP(str(g[0])).exists():
 					pass
 				else:
 					l = cfg.ui.sentinel_2_tableWidget

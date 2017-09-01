@@ -166,7 +166,7 @@ class EditRaster:
 		# convert polygon to raster 
 		tRNxs = cfg.copyTmpROI + dT + "xs.tif"
 		tRxs = str(cfg.tmpDir + "//" + tRNxs)
-		check = cfg.utls.vectorToRaster(cfg.emptyFN, unicode(inputVectorPath), cfg.emptyFN, tRxs, unicode(inputRasterPath), None, "GTiff", 1)
+		check = cfg.utls.vectorToRaster(cfg.emptyFN, str(inputVectorPath), cfg.emptyFN, tRxs, str(inputRasterPath), None, "GTiff", 1)
 		# open input with GDAL
 		rD = cfg.gdalSCP.Open(inputRasterPath, cfg.gdalSCP.GA_Update)
 		if rD is None:
@@ -270,7 +270,7 @@ class EditRaster:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode())
 			return e
-		except Exception, err:
+		except Exception as err:
 			cfg.ui.expression_lineEdit.setStyleSheet("color : red")
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))

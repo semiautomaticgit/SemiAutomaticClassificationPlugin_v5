@@ -51,20 +51,20 @@ class CrossClassification:
 	def classificationLayerName(self):
 		self.clssfctnNm = cfg.ui.classification_name_combo_2.currentText()
 		# logger
-		cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "classification name: " + unicode(self.clssfctnNm))
+		cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "classification name: " + str(self.clssfctnNm))
 	
 	# cross classification calculation
 	def crossClassification(self, classification, reference, batch = "No", shapefileField = None, rasterOutput = None,  NoDataValue = None):
 		# check if numpy is updated
 		try:
 			cfg.np.count_nonzero([1,1,0])
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			rstrCheck = "No"
 			cfg.mx.msgErr26()
 		if batch == "No":
-			rstrOut = cfg.utls.getSaveFileName(None, cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save cross classification raster output"), "", "*.tif")
+			rstrOut = cfg.utls.getSaveFileName(None, cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save cross classification raster output"), "", "*.tif")
 		else:
 			rstrOut = rasterOutput
 		if len(rstrOut) > 0:
@@ -76,13 +76,13 @@ class CrossClassification:
 					# open input with GDAL
 					rD = cfg.gdalSCP.Open(reference, cfg.gdalSCP.GA_ReadOnly)
 					if rD is None:
-						l = cfg.utls.addVectorLayer(unicode(reference) , unicode(cfg.osSCP.path.basename(reference)), "ogr")
+						l = cfg.utls.addVectorLayer(str(reference) , str(cfg.osSCP.path.basename(reference)), "ogr")
 					else:
-						l = cfg.iface.addRasterLayer(unicode(reference), unicode(cfg.osSCP.path.basename(reference)))
+						l = cfg.iface.addRasterLayer(str(reference), str(cfg.osSCP.path.basename(reference)))
 					reml = l
 					rD = None
 					if cfg.osSCP.path.isfile(classification):
-						iClass = cfg.iface.addRasterLayer(unicode(classification), unicode(cfg.osSCP.path.basename(classification)))
+						iClass = cfg.iface.addRasterLayer(str(classification), str(cfg.osSCP.path.basename(classification)))
 						remiClass = iClass
 					else:
 						return "No"
@@ -118,7 +118,7 @@ class CrossClassification:
 						else:
 							try:
 								cfg.utls.repojectShapefile(l.source(), int(vEPSG), reprjShapefile, int(rEPSG))
-							except Exception, err:
+							except Exception as err:
 								# remove temp layers
 								cfg.utls.removeLayerByLayer(reml)
 								cfg.utls.removeLayerByLayer(remiClass)
@@ -130,7 +130,7 @@ class CrossClassification:
 					cfg.uiUtls.addProgressBar()
 					# disable map canvas render for speed
 					cfg.cnvs.setRenderFlag(False)
-					cfg.QtGuiSCP.qApp.processEvents()
+					cfg.QtWidgetsSCP.qApp.processEvents()
 				# temp raster layer
 				tRC= cfg.tmpDir + "/" + cfg.rclssTempNm + dT + ".tif"
 				# cross classification
@@ -141,7 +141,7 @@ class CrossClassification:
 				crossRstPath = crossRstPath.replace('//', '/')
 				tblOut = cfg.osSCP.path.dirname(crossRstPath) + "/" + cfg.osSCP.path.basename(crossRstPath)
 				tblOut = cfg.osSCP.path.splitext(tblOut)[0] + ".csv"
-				if unicode(crossRstPath).lower().endswith(".tif"):
+				if str(crossRstPath).lower().endswith(".tif"):
 					pass
 				else:
 					crossRstPath = crossRstPath + ".tif"
@@ -154,9 +154,9 @@ class CrossClassification:
 						fd = shapefileField
 					if batch == "No":
 						# convert reference layer to raster
-						cfg.utls.vectorToRaster(fd, unicode(l.source()), classification, unicode(tRC))
+						cfg.utls.vectorToRaster(fd, str(l.source()), classification, str(tRC))
 					else:
-						cfg.utls.vectorToRaster(fd, unicode(l.source()), classification, unicode(tRC), classification)
+						cfg.utls.vectorToRaster(fd, str(l.source()), classification, str(tRC), classification)
 					referenceRaster = tRC
 				# if reference raster
 				elif l.type()== 1:
@@ -165,7 +165,7 @@ class CrossClassification:
 					else:
 						referenceRaster = reference
 				# open input with GDAL
-				refRstrDt = cfg.gdalSCP.Open(unicode(referenceRaster), cfg.gdalSCP.GA_ReadOnly)
+				refRstrDt = cfg.gdalSCP.Open(str(referenceRaster), cfg.gdalSCP.GA_ReadOnly)
 				newRstrDt = cfg.gdalSCP.Open(iClass.source(), cfg.gdalSCP.GA_ReadOnly)
 				# No data value
 				if NoDataValue is not None:
@@ -223,7 +223,7 @@ class CrossClassification:
 				tPMD = cfg.tmpDir + "/" + dT + tPMN
 				tPMN2 = dT + cfg.calcRasterNm + ".tif"
 				tPMD2 = cfg.tmpDir + "/" + tPMN2
-				bList = [unicode(referenceRaster), iClass.source()]
+				bList = [str(referenceRaster), iClass.source()]
 				bandNumberList = [1, 1]
 				vrtCheck = cfg.utls.createVirtualRaster2(bList, tPMD, bandNumberList, "Yes", cfg.NoDataVal, 0, "No", "No")
 				# open input with GDAL
@@ -245,14 +245,14 @@ class CrossClassification:
 					try:
 						cfg.utls.removeLayerByLayer(reml)
 						cfg.utls.removeLayerByLayer(remiClass)
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "Error")
 					return "No"
 				# logger
-				cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "cross raster output: " + unicode(rstrOut))
+				cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "cross raster output: " + str(rstrOut))
 				# pixel size
 				cRG = oMR[0].GetGeoTransform()
 				cRPX = abs(cRG[1])
@@ -260,7 +260,7 @@ class CrossClassification:
 				# check projections
 				cRP = oMR[0].GetProjection()
 				cRSR = cfg.osrSCP.SpatialReference(wkt=cRP)
-				un = cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Unknown")
+				un = cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Unknown")
 				if cRSR.IsProjected:
 					un = cRSR.GetAttrValue('unit')
 				# close GDAL rasters
@@ -273,7 +273,7 @@ class CrossClassification:
 					try:
 						cfg.utls.GDALCopyRaster(tPMD2, crossRstPath, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 						cfg.osSCP.remove(tPMD2)
-					except Exception, err:
+					except Exception as err:
 						cfg.shutilSCP.copy(tPMD2, crossRstPath)
 						cfg.osSCP.remove(tPMD2)
 						# logger
@@ -287,25 +287,21 @@ class CrossClassification:
 				cols = sorted(cfg.np.unique(col2).tolist())
 				rows = sorted(cfg.np.unique(row2).tolist())
 				crossClass = cfg.np.zeros((len(rows), len(cols)))
-				cList = "V_" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Classification') + "\t"
+				cList = "V_" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Classification') + "\t"
 				try:
 					l = open(tblOut, 'w')
-				except Exception, err:
+				except Exception as err:
 					# remove temp layers
 					try:
 						cfg.utls.removeLayerByLayer(reml)
 						cfg.utls.removeLayerByLayer(remiClass)
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					return "No"
-				t = cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'CrossClassCode') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Reference') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Classification') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'PixelSum') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Area [' + un + "^2]") + str("\n")
-				try:
-					t = t.encode(cfg.sysSCP.getfilesystemencoding())
-				except:
-					pass
+				t = cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'CrossClassCode') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Reference') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Classification') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'PixelSum') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Area [' + un + "^2]") + str("\n")
 				l.write(t)
 				# open cross raster
 				rDC = cfg.gdalSCP.Open(crossRstPath, cfg.gdalSCP.GA_ReadOnly)
@@ -324,23 +320,11 @@ class CrossClassification:
 							crossClass[rows.index(r), cols.index(c)] = cfg.rasterBandPixelCount * cRPX * cRPY
 				# save combination to table
 				l.write(str("\n"))
-				tStr = "\t" + "> " + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'CROSS MATRIX [') + str(un) + "^2]" + "\n"
-				try:
-					tStr = tStr.encode(cfg.sysSCP.getfilesystemencoding())
-				except:
-					pass
+				tStr = "\t" + "> " + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'CROSS MATRIX [') + str(un) + "^2]" + "\n"
 				l.write(tStr)
-				tStr = "\t" + "> " + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Reference') + "\n"
-				try:
-					tStr = tStr.encode(cfg.sysSCP.getfilesystemencoding())
-				except:
-					pass
+				tStr = "\t" + "> " + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Reference') + "\n"
 				l.write(tStr)
-				tStr = cList + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Total') + "\n"
-				try:
-					tStr = tStr.encode(cfg.sysSCP.getfilesystemencoding())
-				except:
-					pass
+				tStr = cList + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Total') + "\n"
 				l.write(tStr)
 				# temp matrix
 				tmpMtrx= cfg.tmpDir + "/" + cfg.tempMtrxNm + dT + ".txt"
@@ -353,15 +337,11 @@ class CrossClassification:
 					l.write(tMR)
 					ix = ix + 1
 				# last line
-				lL = cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Total')
+				lL = cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Total')
 				for c in range(0, len(cols)):
 					lL = lL + "\t" + str(int(crossClass[:, c].sum()))
 				totMat = int(crossClass.sum())
 				lL = lL + "\t" + str(totMat) + str("\n")
-				try:
-					lL = lL.encode(cfg.sysSCP.getfilesystemencoding())
-				except:
-					pass
 				l.write(lL)
 				l.close()
 				# close bands
@@ -369,8 +349,8 @@ class CrossClassification:
 					bLC[b] = None
 				rDC = None
 				# add raster to layers
-				cfg.iface.addRasterLayer(unicode(crossRstPath), unicode(cfg.osSCP.path.basename(crossRstPath)))
-				rstr = cfg.utls.selectLayerbyName(unicode(cfg.osSCP.path.basename(crossRstPath)), "Yes")
+				cfg.iface.addRasterLayer(str(crossRstPath), str(cfg.osSCP.path.basename(crossRstPath)))
+				rstr = cfg.utls.selectLayerbyName(str(cfg.osSCP.path.basename(crossRstPath)), "Yes")
 				cfg.utls.rasterSymbolGeneric(rstr, "NoData")	
 				try:
 					f = open(tblOut)
@@ -379,7 +359,7 @@ class CrossClassification:
 						cfg.ui.cross_matrix_textBrowser.setText(eM)
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " cross matrix calculated")
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				cfg.uiUtls.updateBar(100)
@@ -409,21 +389,21 @@ class CrossClassification:
 				f = l.dataProvider().fields()
 				for i in f:
 					if i.typeName() != "String":
-						cfg.dlg.class_field_combo_2(unicode(i.name()))
+						cfg.dlg.class_field_combo_2(str(i.name()))
 		except:
 			pass
 		# logger
-		cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "reference layer name: " + unicode(cfg.referenceLayer2))
+		cfg.utls.logCondition(str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "reference layer name: " + str(cfg.referenceLayer2))
 	
 	# refresh reference layer name
 	def refreshReferenceLayer(self):
-		ls = cfg.lgnd.layers()
+		ls = cfg.qgisCoreSCP.QgsProject.instance().mapLayers().values()
 		cfg.ui.reference_name_combo_2.clear()
 		# reference layer name
 		cfg.referenceLayer2 = None
 		for l in ls:
 			if (l.type()==QgsMapLayer.VectorLayer):
-				if (l.geometryType() == QGis.Polygon):
+				if (l.wkbType() == QgsWkbTypes.Polygon):
 					cfg.dlg.reference_layer_combo_2(l.name())
 			elif (l.type()==QgsMapLayer.RasterLayer):
 				if l.bandCount() == 1:

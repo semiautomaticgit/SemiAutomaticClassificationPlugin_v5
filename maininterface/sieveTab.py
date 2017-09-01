@@ -48,14 +48,14 @@ class SieveRaster:
 	# sieve classification
 	def sieveClassification(self, batch = "No", rasterInput = None, rasterOutput = None):
 		if batch == "No":
-			d = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save output"), "", "Image (*.tif)")
+			d = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save output"), "", "Image (*.tif)")
 		else:
 			d = rasterOutput
 		if len(d) > 0:
 			d = d.replace('\\', '/')
 			d = d.replace('//', '/')
-			sN = cfg.osSCP.path.basename(unicode(d))
-			if unicode(sN).endswith(".tif"):
+			sN = cfg.osSCP.path.basename(str(d))
+			if str(sN).endswith(".tif"):
 				outputRaster = d
 			else:
 				nm = cfg.osSCP.path.splitext(sN)[0]

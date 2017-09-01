@@ -48,7 +48,7 @@ class PcaTab:
 	# calculate PCA
 	def calculatePCA(self, batch = "No", outputDirectory = None):
 		if batch == "No":
-			outF = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
+			outF = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory"))
 		else:
 			outF = outputDirectory
 		if len(outF) > 0:
@@ -64,7 +64,7 @@ class PcaTab:
 				# open input with GDAL
 				bL = []
 				for i in range(0, len(bS)):
-					rD = cfg.gdalSCP.Open(unicode(bS[i]), cfg.gdalSCP.GA_ReadOnly)
+					rD = cfg.gdalSCP.Open(str(bS[i]), cfg.gdalSCP.GA_ReadOnly)
 					bL.append(rD)
 			else:
 				# if masked raster
@@ -76,7 +76,7 @@ class PcaTab:
 						iR = r.source()
 						# open input with GDAL
 						rD = cfg.gdalSCP.Open(iR, cfg.gdalSCP.GA_ReadOnly)
-					except Exception, err:
+					except Exception as err:
 						# logger
 						if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						return "No"
@@ -139,12 +139,12 @@ class PcaTab:
 		# copy raster
 		if o != "No":
 			for r in tempRasterList:
-				out = outputDirectory + "/" + unicode(cfg.osSCP.path.basename(r)[21:])
+				out = outputDirectory + "/" + str(cfg.osSCP.path.basename(r)[21:])
 				if cfg.rasterCompression != "No":
 					try:
 						cfg.utls.GDALCopyRaster(r, out, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 						cfg.osSCP.remove(r)
-					except Exception, err:
+					except Exception as err:
 						cfg.shutilSCP.copy(r, out)
 						cfg.osSCP.remove(r)
 						# logger
@@ -153,7 +153,7 @@ class PcaTab:
 					cfg.shutilSCP.copy(r, out)
 					cfg.osSCP.remove(r)
 				# add raster to layers
-				cfg.iface.addRasterLayer(unicode(out), unicode(cfg.osSCP.path.basename(out)))
+				cfg.iface.addRasterLayer(str(out), str(cfg.osSCP.path.basename(out)))
 		cfg.uiUtls.updateBar(90)		
 		# display parameters
 		self.displayParameters(covM, corrM, comp, totalVariance, totalVarianceCumulative, eigenValues, outputDirectory)
@@ -170,15 +170,15 @@ class PcaTab:
 		tblOut = outputDirectory + "/" + cfg.PCAReportNm
 		try:
 			l = open(tblOut, 'w')
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			return "No"
-		t = str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Principal Components Analysis')) + "	" + str("\n") + str("\n")
+		t = str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Principal Components Analysis')) + "	" + str("\n") + str("\n")
 		l.write(t)
-		t = str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Covariance matrix')) + "	"
+		t = str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Covariance matrix')) + "	"
 		l.write(str(t) + str("\n"))
-		tB = str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Bands')) + "	"
+		tB = str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Bands')) + "	"
 		for y in range(0, covarianceMatrix.shape[0]):
 			tB = tB + str(y + 1) + "	"
 		l.write(str(tB) + str("\n"))
@@ -188,7 +188,7 @@ class PcaTab:
 				t = t + str(covarianceMatrix[y,x]) + "	"
 			l.write(str(t) + str("\n"))
 		l.write(str("\n"))
-		t = str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Correlation matrix')) + "	"
+		t = str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Correlation matrix')) + "	"
 		l.write(str(t) + str("\n"))
 		l.write(str(tB) + str("\n"))
 		for y in range(0, correlationMatrix.shape[0]):
@@ -197,11 +197,11 @@ class PcaTab:
 				t = t + str(correlationMatrix[y,x]) + "	"
 			l.write(str(t) + str("\n"))
 		l.write(str("\n"))
-		t = str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Eigen vectors')) + "	"
+		t = str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Eigen vectors')) + "	"
 		l.write(str(t) + str("\n"))
-		tB = str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Bands')) + "	"
+		tB = str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Bands')) + "	"
 		for y in range(0, len(components)):
-			tB = tB + str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Vector_')) + str(y + 1) + "	"
+			tB = tB + str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Vector_')) + str(y + 1) + "	"
 		l.write(str(tB) + str("\n"))
 		for i in range(0, len(components)):
 			t = str(i + 1) + "	"
@@ -209,7 +209,7 @@ class PcaTab:
 				t = t + str(v[i]) + "	"
 			l.write(str(t) + str("\n"))
 		l.write(str("\n"))
-		t = str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Eigen values')) + "	" + str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Accounted variance')) + "	" + str(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Cumulative variance')) + "	"
+		t = str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Eigen values')) + "	" + str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Accounted variance')) + "	" + str(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Cumulative variance')) + "	"
 		l.write(str(t) + str("\n"))
 		for i in range(0, len(eigenValues)):
 			t = str(eigenValues[i]) + "	" + str(totalVariance[i]) + "	" + str(totalVarianceCumulative[i])
@@ -222,14 +222,14 @@ class PcaTab:
 				cfg.ui.report_textBrowser_2.setText(str(eM))
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " error matrix calculated")
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 	
 	# create covariance matrix
 	def createCovarianceMatrix(self, bandList):
 		m = cfg.np.zeros((len(bandList), len(bandList)))
-		comb = cfg.itertoolsSCP.combinations(range(0, len(bandList)), 2)
+		comb = cfg.itertoolsSCP.combinations(list(range(0, len(bandList))), 2)
 		for i in comb:
 			v = cfg.rasterPixelCountPCA["COV_BAND_" + str(i[0]) + "-" + str(i[1])]
 			m.itemset((int(i[0]), int(i[1])), v)

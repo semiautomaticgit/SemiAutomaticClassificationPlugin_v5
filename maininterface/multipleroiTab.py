@@ -90,7 +90,7 @@ class MultipleROITab:
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), "No image selected")
 		img = cfg.utls.selectLayerbyName(imageName, "Yes")
 		crs = cfg.utls.getCrs(img)
-		geographicFlag = crs.geographicFlag()
+		geographicFlag = crs.isGeographic()
 		if geographicFlag is False:
 			cfg.uiUtls.addProgressBar()
 			tLX, tLY, lRX, lRY, pSX, pSY = cfg.utls.imageInformationSize(imageName)
@@ -106,8 +106,8 @@ class MultipleROITab:
 				minDistance = int(cfg.ui.point_distance_spinBox.value())
 			if cfg.ui.point_grid_checkBox.isChecked() is True:
 				gridSize = int(cfg.ui.point_grid_spinBox.value())
-				XRange = range(Xmin, Xmax, gridSize)
-				YRange = range(Ymin, Ymax, gridSize)
+				XRange = list(range(Xmin, Xmax, gridSize))
+				YRange = list(range(Ymin, Ymax, gridSize))
 				if len(XRange) == 1:
 					XRange = [Xmin, Xmax]	
 				if len(YRange) == 1:
@@ -143,13 +143,13 @@ class MultipleROITab:
 				pass
 			cfg.uiUtls.addProgressBar()
 			for i in range(0, c):
-				cfg.QtGuiSCP.qApp.processEvents()
+				cfg.QtWidgetsSCP.qApp.processEvents()
 				if cfg.actionCheck != "No":
 					cfg.uiUtls.updateBar((i+1) * 100 / (c + 1))
 					try:
 						X = tW.item(i,0).text()
 						Y = tW.item(i,1).text()
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						cfg.mx.msg6()
@@ -184,7 +184,7 @@ class MultipleROITab:
 							cfg.classD.saveROItoShapefile("No")
 							# disable undo save ROI
 							cfg.uidc.undo_save_Button.setEnabled(False)
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						cfg.mx.msgErr20()
@@ -210,7 +210,7 @@ class MultipleROITab:
 
 	# export point list to file
 	def exportPointList(self):
-		pointListFile = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save the point list to file"), "", "CSV (*.csv)")
+		pointListFile = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save the point list to file"), "", "CSV (*.csv)")
 		try:
 			f = open(pointListFile, 'w')
 			f.write("X;Y;MC ID;MC Info;C ID;C Info;Min size;Max width;Range radius;Rapid ROI band\n")
@@ -244,7 +244,7 @@ class MultipleROITab:
 				f.close()
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " point list exported")
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		
@@ -287,7 +287,7 @@ class MultipleROITab:
 					cfg.utls.addTableItem(tW, RBand, c, 9)
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " points imported")
-		except Exception, err:
+		except Exception as err:
 			cfg.mx.msgErr19()
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))

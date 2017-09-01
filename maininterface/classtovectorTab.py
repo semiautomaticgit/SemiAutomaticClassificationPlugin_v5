@@ -52,13 +52,13 @@ class ClassToVectorTab:
 			i = cfg.utls.selectLayerbyName(self.clssfctnNm, "Yes")
 			try:
 				classificationPath = i.source()
-			except Exception, err:
+			except Exception as err:
 				cfg.mx.msg4()
 				cfg.utls.refreshClassificationLayer()
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				return "No"
-			out = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save shapefile output"), "", "*.shp")
+			out = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save shapefile output"), "", "*.shp")
 		else:
 			if cfg.osSCP.path.isfile(inputRaster):
 				classificationPath = inputRaster

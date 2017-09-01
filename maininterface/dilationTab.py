@@ -53,7 +53,7 @@ class DilationRaster:
 			cfg.ui.dilation_classes_lineEdit.setStyleSheet("color : green")
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode())
-		except Exception, err:
+		except Exception as err:
 			cfg.ui.dilation_classes_lineEdit.setStyleSheet("color : red")
 			valueList = []
 			# logger
@@ -70,14 +70,14 @@ class DilationRaster:
 		valueList = self.checkValueList()
 		if len(valueList) > 0:
 			if batch == "No":
-				d = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save output"), "", "Image (*.tif)")
+				d = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save output"), "", "Image (*.tif)")
 			else:
 				d = rasterOutput
 			if len(d) > 0:
 				d = d.replace('\\', '/')
 				d = d.replace('//', '/')
-				sN = cfg.osSCP.path.basename(unicode(d))
-				if unicode(sN).endswith(".tif"):
+				sN = cfg.osSCP.path.basename(str(d))
+				if str(sN).endswith(".tif"):
 					outputRaster = d
 				else:
 					nm = cfg.osSCP.path.splitext(sN)[0]
@@ -143,7 +143,7 @@ class DilationRaster:
 					if cfg.rasterCompression != "No":
 						try:
 							cfg.utls.GDALCopyRaster(tPMD, outputRaster, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
-						except Exception, err:
+						except Exception as err:
 							cfg.shutilSCP.copy(tPMD, outputRaster)
 							# logger
 							if cfg.logSetVal == "Yes": cfg.utls.logToFile(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))

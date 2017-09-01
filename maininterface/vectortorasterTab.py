@@ -62,7 +62,7 @@ class VectorToRasterTab:
 			if len(fd) == 0:
 				cfg.utls.refreshVectorLayer()
 				return
-			rstrOut = cfg.utls.getSaveFileName(None, cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster output"), "", "*.tif")
+			rstrOut = cfg.utls.getSaveFileName(None, cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster output"), "", "*.tif")
 		else:
 			vectorSource = vectorPath
 			referenceRasterPath = rasterPath
@@ -70,7 +70,7 @@ class VectorToRasterTab:
 			rstrOut = rasterOutput
 			fd = fieldName
 		if len(rstrOut) > 0:
-			if unicode(rstrOut).lower().endswith(".tif"):
+			if str(rstrOut).lower().endswith(".tif"):
 				pass
 			else:
 				rstrOut = rstrOut + ".tif"

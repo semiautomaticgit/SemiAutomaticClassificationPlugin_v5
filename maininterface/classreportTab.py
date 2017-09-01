@@ -44,19 +44,19 @@ class ClassReportTab:
 	# calculate classification report
 	def calculateClassificationReport(self, classificationPath, NoDataValue = None,  batch = "No", rasterOutput = None):
 		if batch == "No":
-			r = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save classification report"), "", "Text (*.csv)")
+			r = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save classification report"), "", "Text (*.csv)")
 		else:
 			r = rasterOutput
 		if len(r) > 0:
 			# date time for temp name
 			dT = cfg.utls.getTime()
 			# temp report
-			rN = cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "report") + dT + ".csv"
+			rN = cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "report") + dT + ".csv"
 			cfg.reportPth = str(cfg.tmpDir + "/" + rN)
 			try:
-				clssRstrSrc = unicode(classificationPath)
+				clssRstrSrc = str(classificationPath)
 				ck = "Yes"
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				ck = "No"
@@ -82,7 +82,7 @@ class ClassReportTab:
 				# check projections
 				cRP = rD.GetProjection()
 				cRSR = cfg.osrSCP.SpatialReference(wkt=cRP)
-				un = cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Unknown")
+				un = cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Unknown")
 				if cRSR.IsProjected:
 					un = cRSR.GetAttrValue('unit')
 				else:
@@ -108,11 +108,7 @@ class ClassReportTab:
 				sum = cfg.rasterBandPixelCount
 				# save combination to table
 				l = open(cfg.reportPth, 'w')
-				t = cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Class') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'PixelSum') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Percentage %') + "	" + cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", 'Area [' + un + "^2]") + str("\n")
-				try:
-					t = t.encode(cfg.sysSCP.getfilesystemencoding())
-				except:
-					pass
+				t = cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Class') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'PixelSum') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Percentage %') + "	" + cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", 'Area [' + un + "^2]") + str("\n")
 				l.write(t)
 				for i in cfg.rasterBandUniqueVal:
 					cfg.rasterBandPixelCount = 0
@@ -132,7 +128,7 @@ class ClassReportTab:
 					if cfg.osSCP.path.isfile(cfg.reportPth):
 						reportTxt = f.read()
 						cfg.ui.report_textBrowser.setText(str(reportTxt))
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					if batch == "No":
@@ -142,7 +138,7 @@ class ClassReportTab:
 					cfg.shutilSCP.copy(cfg.reportPth, r)
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " report saved")
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				if batch == "No":

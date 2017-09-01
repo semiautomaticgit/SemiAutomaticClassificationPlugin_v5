@@ -54,7 +54,7 @@ class Signature_Importer:
 					ref.append(float(v[1]))
 					sD.append(float(v[2]))
 				wavelength = cfg.np.array(wl)
-				a = cfg.bndSetWvLn.values()
+				a = list(cfg.bndSetWvLn.values())
 				s = sorted(a, key=float)
 				b = 0
 				cfg.tblOut = {}
@@ -94,7 +94,7 @@ class Signature_Importer:
 					ref.append(float(v[1]) / 100)
 					sD.append(float(0))
 				wavelength = cfg.np.array(wl)
-				a = cfg.bndSetWvLn.values()
+				a = list(cfg.bndSetWvLn.values())
 				s = sorted(a, key=float)
 				b = 0
 				cfg.tblOut = {}
@@ -144,7 +144,7 @@ class Signature_Importer:
 				except:
 					sD.append(float(0))
 			wavelength = cfg.np.array(wl)
-			a = cfg.bndSetWvLn.values()
+			a = list(cfg.bndSetWvLn.values())
 			s = sorted(a, key=float)
 			b = 0
 			cfg.tblOut = {}
@@ -182,7 +182,7 @@ class Signature_Importer:
 		
 	# open a shapefile
 	def openShapefileI(self):
-		shpFile = cfg.utls.getOpenFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a shapefile"), "", "Shapefile (*.shp)")
+		shpFile = cfg.utls.getOpenFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a shapefile"), "", "Shapefile (*.shp)")
 		if len(shpFile) > 0:
 			fields = cfg.utls.fieldsShapefile(shpFile)
 			cfg.ui.MC_ID_combo.clear()

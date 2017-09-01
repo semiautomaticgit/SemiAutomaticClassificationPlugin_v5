@@ -44,7 +44,7 @@ class StackRasterBands:
 			
 	# Set rasters checklist
 	def rasterNameList(self):
-		ls = cfg.lgnd.layers()
+		ls = cfg.qgisCoreSCP.QgsProject.instance().mapLayers().values()
 		# checklist
 		lst = cfg.ui.raster_listView_3
 		# create band item model
@@ -102,7 +102,7 @@ class StackRasterBands:
 				self.allRasterSetState(2)
 				# set check all bands
 				self.allRastersCheck = "No"
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		cfg.uiUtls.removeProgressBar()
@@ -141,7 +141,7 @@ class StackRasterBands:
 					itS = cfg.utls.selectLayerbyName(itN, "Yes")
 					try:
 						rT.append(itS.source())
-					except Exception, err:
+					except Exception as err:
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						cfg.mx.msgErr9()
@@ -151,7 +151,7 @@ class StackRasterBands:
 					cfg.uiUtls.removeProgressBar()
 				return "No"
 			if outputFile is None:
-				rstrOut = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster"), "", "*.tif")
+				rstrOut = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Save raster"), "", "*.tif")
 			else:
 				rstrOut = outputFile
 		else:
@@ -163,7 +163,7 @@ class StackRasterBands:
 			if outputFile is None:
 				cfg.uiUtls.addProgressBar()
 			cfg.cnvs.setRenderFlag(False)
-			if unicode(rstrOut).endswith(".tif"):
+			if str(rstrOut).endswith(".tif"):
 				rstrOut = rstrOut
 			else:
 				rstrOut = rstrOut + ".tif"
@@ -178,7 +178,7 @@ class StackRasterBands:
 					try:
 						cfg.utls.GDALCopyRaster(tPMD2, rstrOut, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 						cfg.osSCP.remove(tPMD2)
-					except Exception, err:
+					except Exception as err:
 						cfg.shutilSCP.copy(tPMD2, rstrOut)
 						cfg.osSCP.remove(tPMD2)
 						# logger
@@ -187,7 +187,7 @@ class StackRasterBands:
 					cfg.shutilSCP.copy(tPMD2, rstrOut)
 					cfg.osSCP.remove(tPMD2)
 				# add raster to layers
-				cfg.iface.addRasterLayer(unicode(rstrOut), unicode(cfg.osSCP.path.basename(rstrOut)))
+				cfg.iface.addRasterLayer(str(rstrOut), str(cfg.osSCP.path.basename(rstrOut)))
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " raster: " + str(st))
 				cfg.uiUtls.updateBar(100)

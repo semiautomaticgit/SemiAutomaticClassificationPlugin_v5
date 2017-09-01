@@ -572,7 +572,7 @@ indEVI = "EVI"
 indicesList = ["", indNDVI, indEVI]
 # unit list
 noUnit = "band number"
-wlMicro = u"µm (1 E-6m)"
+wlMicro = "µm (1 E-6m)"
 wlNano = "nm (1 E-9m)"
 unitNano = "E-9m"
 unitMicro = "E-6m"

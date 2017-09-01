@@ -40,13 +40,14 @@ class ClipMultipleRasters:
 
 	def __init__(self):
 		# emit a QgsPoint on each click
-		self.clickUL = QgsMapToolEmitPoint(cfg.cnvs)
+		#self.clickUL = QgsMapToolEmitPoint(cfg.cnvs)
 		# connect to pointerClick when map is clicked
-		self.clickUL.canvasClicked.connect(self.pointerClickUL)
+		#self.clickUL.canvasClicked.connect(self.pointerClickUL)
 		# emit a QgsPoint on each click
-		self.clickLR = QgsMapToolEmitPoint(cfg.cnvs)
+		#self.clickLR = QgsMapToolEmitPoint(cfg.cnvs)
 		# connect to pointerClick when map is clicked
-		self.clickLR.canvasClicked.connect(self.pointerClickLR)
+		#self.clickLR.canvasClicked.connect(self.pointerClickLR)
+		pass
 		
 	# add rubber band
 	def addRubberBandPolygon(self, pointUL, pointLR):
@@ -121,13 +122,13 @@ class ClipMultipleRasters:
 				if batch == "No":
 					cfg.uiUtls.removeProgressBar()
 				return "No"
-			oD = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory where to save clipped rasters"))
+			oD = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Select a directory where to save clipped rasters"))
 			if len(oD) == 0:
 				if batch == "No":
 					cfg.uiUtls.removeProgressBar()
 				return "No"
 			# logger
-			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " rasters to be clipped" + unicode(rT))
+			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " rasters to be clipped" + str(rT))
 			if cfg.ui.shapefile_checkBox.isChecked() is True:
 				# use shape
 				uS = 1
@@ -135,7 +136,7 @@ class ClipMultipleRasters:
 				sL = cfg.utls.selectLayerbyName(sN)
 				try:
 					s = sL.source()
-				except Exception, err:
+				except Exception as err:
 					cfg.mx.msgErr11()
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
@@ -178,7 +179,7 @@ class ClipMultipleRasters:
 		if len(oD) > 0:
 			outputName = cfg.ui.output_clip_name_lineEdit.text()
 			if len(outputName) > 0:
-				outputName = str(outputName.encode('ascii','replace'))
+				outputName = str(outputName.encode('ascii','replace'))[2:-1]
 			else:
 				outputName = cfg.clipNm
 			# no shapefile
@@ -233,7 +234,7 @@ class ClipMultipleRasters:
 							pass
 						else:
 							l = l + ".tif"
-						cL = lC.source().encode(cfg.sysSCP.getfilesystemencoding())
+						cL = lC.source()
 					else:
 						if str(l).lower().endswith(".tif"):
 							pass
@@ -241,9 +242,9 @@ class ClipMultipleRasters:
 							l = l + ".tif"
 						cL = l
 					dT = cfg.utls.getTime()
-					c = oD.encode(cfg.sysSCP.getfilesystemencoding()) + "/"
+					c = oD + "/"
 					d = outputName + "_" 
-					e = cfg.osSCP.path.basename(l.encode(cfg.sysSCP.getfilesystemencoding()))
+					e = cfg.osSCP.path.basename(l)
 					f = c + d + e
 					tPMN = cfg.tmpVrtNm + ".vrt"
 					tPMD = cfg.tmpDir + "/" + dT + tPMN
@@ -257,7 +258,7 @@ class ClipMultipleRasters:
 						try:
 							cfg.utls.GDALCopyRaster(tPMD2, f, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 							cfg.osSCP.remove(tPMD2)
-						except Exception, err:
+						except Exception as err:
 							cfg.shutilSCP.copy(tPMD2, f)
 							cfg.osSCP.remove(tPMD2)
 							# logger
@@ -265,20 +266,20 @@ class ClipMultipleRasters:
 					else:
 						cfg.shutilSCP.copy(tPMD2, f)
 						cfg.osSCP.remove(tPMD2)
-					cfg.iface.addRasterLayer(unicode(oD) + "/" + outputName + "_" + unicode(cfg.osSCP.path.basename(unicode(l))), unicode(outputName + "_" + unicode(cfg.osSCP.path.basename(unicode(l)))))
+					cfg.iface.addRasterLayer(str(oD) + "/" + outputName + "_" + str(cfg.osSCP.path.basename(str(l))), str(outputName + "_" + str(cfg.osSCP.path.basename(str(l)))))
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " rasters clipped" )
 			# using shapefile
 			elif uS == 1:
 				dT = cfg.utls.getTime()
 				# vector EPSG
-				if "MultiPolygon?crs=PROJCS" in unicode(s):
+				if "MultiPolygon?crs=PROJCS" in str(s):
 					# temp shapefile
 					tSHP = cfg.tmpDir + "/" + sN + dT + ".shp"
 					s = cfg.utls.saveMemoryLayerToShapefile(sL, tSHP)
 					s = s.source()
 					vEPSG = cfg.utls.getEPSGVector(tSHP)
-				elif "QgsVectorLayer" in unicode(s):
+				elif "QgsVectorLayer" in str(s):
 					# temporary layer
 					tLN = cfg.subsTmpROI + dT + ".shp"
 					tLP = cfg.tmpDir + "/" + dT + tLN
@@ -305,7 +306,7 @@ class ClipMultipleRasters:
 							pass
 						else:
 							l = l + ".tif"
-						cL = lC.source().encode(cfg.sysSCP.getfilesystemencoding())
+						cL = lC.source()
 					else:
 						if str(l).lower().endswith(".tif"):
 							pass
@@ -326,23 +327,23 @@ class ClipMultipleRasters:
 						else:
 							try:
 								cfg.utls.repojectShapefile(s, int(vEPSG), reprjShapefile, int(rEPSG))
-							except Exception, err:
+							except Exception as err:
 								# logger
 								cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 								return "No"
 							vect = reprjShapefile
 					check = cfg.utls.vectorToRaster(cfg.emptyFN, vect, cfg.emptyFN, tRxs, cL, None, "GTiff", 1)
 					if check != "No":
-						b = oD.encode(cfg.sysSCP.getfilesystemencoding()) + "/" 
+						b = oD + "/" 
 						c = outputName + "_" 
-						d = cfg.osSCP.path.basename(l.encode(cfg.sysSCP.getfilesystemencoding()))
+						d = cfg.osSCP.path.basename(l)
 						e = b + c + d
 						cfg.utls.clipRasterByRaster(cL, tRxs, tPMD2, "GTiff", noDt)
 						if cfg.rasterCompression != "No":
 							try:
 								cfg.utls.GDALCopyRaster(tPMD2, e, "GTiff", cfg.rasterCompression, "DEFLATE -co PREDICTOR=2 -co ZLEVEL=1")
 								cfg.osSCP.remove(tPMD2)
-							except Exception, err:
+							except Exception as err:
 								cfg.shutilSCP.copy(tPMD2, e)
 								cfg.osSCP.remove(tPMD2)
 								# logger
@@ -354,7 +355,7 @@ class ClipMultipleRasters:
 							cfg.osSCP.remove(tRxs)
 						except:
 							pass
-						cfg.iface.addRasterLayer(unicode(oD) + "/" + outputName + "_" + unicode(cfg.osSCP.path.basename(unicode(l))), unicode(outputName + "_" + unicode(cfg.osSCP.path.basename(unicode(l)))))
+						cfg.iface.addRasterLayer(str(oD) + "/" + outputName + "_" + str(cfg.osSCP.path.basename(str(l))), str(outputName + "_" + str(cfg.osSCP.path.basename(str(l)))))
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " rasters clipped" )
 					else:
@@ -410,7 +411,7 @@ class ClipMultipleRasters:
 			
 	# Set rasters checklist
 	def rasterNameList(self):
-		ls = cfg.lgnd.layers()
+		ls = cfg.qgisCoreSCP.QgsProject.instance().mapLayers().values()
 		# checklist
 		lst = cfg.ui.raster_listView_2
 		# create band item model
@@ -454,7 +455,7 @@ class ClipMultipleRasters:
 				self.allRasterSetState(2)
 				# set check all bands
 				self.allRastersCheck = "No"
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				pass

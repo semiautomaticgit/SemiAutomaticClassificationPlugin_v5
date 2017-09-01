@@ -142,7 +142,7 @@ class DownloadSentinelImages:
 		cfg.sets.setQGISRegSetting(cfg.regSciHubService, cfg.SciHubServiceNm)
 
 	# user
-	def rememberUser(self):
+	def rememberUser(self):	
 		if cfg.ui.remember_user_checkBox.isChecked():
 			user = cfg.ui.user_scihub_lineEdit.text()
 			pswd = cfg.utls.encryptPassword(cfg.ui.password_scihub_lineEdit.text())
@@ -158,7 +158,7 @@ class DownloadSentinelImages:
 		
 	# download image preview from Amazon
 	def downloadPreviewAmazon(self, imgID, imgIDN, imgIDT, imgIDTT, acquisitionDate, progress = None):
-		url = "http://sentinel-s2-l1c.s3.amazonaws.com/tiles/" + imgIDN + "/" + imgIDT + "/" + imgIDTT + "/" + acquisitionDate[0:4] + "/" + acquisitionDate[5:7].lstrip('0') + "/" + acquisitionDate[8:10].lstrip('0') + "/0/preview.jp2"
+		url = "http://sentinel-s2-l1c.s3.amazonaws.com/tiles/" + imgIDN + "/" + imgIDT + "/" + imgIDTT + "/" + acquisitionDate[0:4] + "/" + acquisitionDate[5:7].replace("0", "") + "/" + acquisitionDate[8:10].replace("0", "") + "/0/preview.jp2"
 		check = cfg.utls.downloadFile(url, cfg.tmpDir + "//" + imgID + '_p.jp2', imgID, progress)
 		return check
 		
@@ -186,7 +186,7 @@ class DownloadSentinelImages:
 				if cfg.osSCP.path.isfile(cfg.tmpDir + "//" + imgID):
 					l = cfg.utls.selectLayerbyName(imgID)
 					if l is not None:		
-						cfg.lgnd.setLayerVisible(l, True)
+						cfg.utls.setLayerVisible(l, True)
 						cfg.utls.moveLayerTop(l)
 					else:
 						r = cfg.utls.addRasterLayer(cfg.tmpDir + "//" + imgID, imgID)
@@ -241,7 +241,7 @@ class DownloadSentinelImages:
 				if cfg.osSCP.path.isfile(cfg.tmpDir + "//" + imgID + ".vrt"):
 					l = cfg.utls.selectLayerbyName(imgID + ".vrt")
 					if l is not None:		
-						cfg.lgnd.setLayerVisible(l, True)
+						cfg.utls.setLayerVisible(l, True)
 						cfg.utls.moveLayerTop(l)
 					else:
 						r = cfg.utls.addRasterLayer(cfg.tmpDir + "//" + imgID + ".vrt", imgID + ".vrt")
@@ -267,12 +267,7 @@ class DownloadSentinelImages:
 		topUrl =topLevelUrl
 		# logger
 		cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " " + topLevelUrl)
-		# response = cfg.utls.passwordConnect(user, password, topUrl + '/search?q=', topLevelUrl, None, None, "Yes")
-		# if response == "No":
-			# cfg.mx.msgErr40()
-			# # logger
-			# cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " error connection " + topUrl)
-		check = cfg.utls.passwordConnect(user, password, url, topLevelUrl, output, progress)
+		check = cfg.utls.passwordConnectPython(user, password, url, topLevelUrl, output, progress)
 		if check == "Yes":
 			return output
 		else:
@@ -286,7 +281,7 @@ class DownloadSentinelImages:
 		# check url
 		topLevelUrl = cfg.ui.sentinel_service_lineEdit.text()
 		topUrl =topLevelUrl
-		check = cfg.utls.passwordConnect(user, password, imageJPG, topLevelUrl, cfg.tmpDir + "//" + imgID + "_thumb.jpg", progress)
+		check = cfg.utls.passwordConnectPython(user, password, imageJPG, topLevelUrl, cfg.tmpDir + "//" + imgID + "_thumb.jpg", progress)
 		if check == "Yes":
 			cLon = (float(min_lon) + float(max_lon)) / 2
 			cLat = (float(min_lat) + float(max_lat)) / 2
@@ -323,12 +318,12 @@ class DownloadSentinelImages:
 					out, err = sP.communicate()
 					sP.stdout.close()
 					if len(err) > 0:
-						cfg.mx.msgBarError(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Error"), err)
+						cfg.mx.msgBarError(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Error"), err)
 						st = "Yes"
 						# logger
 						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " GDAL error:: " + str(err) )
 				# in case of errors
-				except Exception, err:
+				except Exception as err:
 					# logger
 					cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 					sP = cfg.subprocessSCP.Popen(a, shell=True)
@@ -350,7 +345,7 @@ class DownloadSentinelImages:
 		tW = cfg.ui.sentinel_images_tableWidget
 		c = tW.rowCount()
 		if c > 0:
-			d = cfg.utls.getExistingDirectory(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Download the images in the table (requires internet connection)"))
+			d = cfg.utls.getExistingDirectory(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Download the images in the table (requires internet connection)"))
 			if len(d) > 0:
 				self.downloadSentinelImages(d)
 		
@@ -546,7 +541,7 @@ class DownloadSentinelImages:
 		tW = cfg.ui.sentinel_images_tableWidget
 		c = tW.rowCount()
 		if c > 0:
-			d = cfg.utls.getSaveFileName(None , cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Export download links"), "", "*.txt")
+			d = cfg.utls.getSaveFileName(None , cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Export download links"), "", "*.txt")
 			if len(d) > 0:
 				links = self.downloadSentinelImages("No", "Yes")
 				if links == "No":
@@ -582,15 +577,15 @@ class DownloadSentinelImages:
 			rubbRect = QgsRectangle(float(cfg.ui.UX_lineEdit_5.text()), float(cfg.ui.UY_lineEdit_5.text()), float(cfg.ui.LX_lineEdit_5.text()), float(cfg.ui.LY_lineEdit_5.text()))
 			if abs(float(cfg.ui.UX_lineEdit_5.text()) - float(cfg.ui.LX_lineEdit_5.text())) > 10 or abs(float(cfg.ui.UY_lineEdit_5.text()) - float(cfg.ui.LY_lineEdit_5.text())) > 10:
 				cfg.mx.msgWar18()
-		except Exception, err:
+		except Exception as err:
 			# logger
 			cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 			cfg.mx.msg23()
 			return "No"
 		cfg.uiUtls.addProgressBar()
 		tW = cfg.ui.sentinel_images_tableWidget
-		cfg.uiUtls.updateBar(30, cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
-		cfg.QtGuiSCP.qApp.processEvents()
+		cfg.uiUtls.updateBar(30, cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
+		cfg.QtWidgetsSCP.qApp.processEvents()
 		user = cfg.ui.user_scihub_lineEdit.text()
 		password =cfg.ui.password_scihub_lineEdit.text()
 		imageTableList = []
@@ -603,16 +598,16 @@ class DownloadSentinelImages:
 			maxResultNum = 100
 		for startR in range(0, resultNum, maxResultNum):
 			url = topUrl + '/search?q=' + imgQuery + '%20AND%20cloudcoverpercentage:[0%20TO%20' + str(maxCloudCover) + ']%20AND%20beginPosition:[' + str(dateFrom) + 'T00:00:00.000Z%20TO%20' + str(dateTo) + 'T23:59:59.999Z]%20AND%20footprint:"Intersects(POLYGON((' + cfg.ui.UX_lineEdit_5.text() + "%20" + cfg.ui.UY_lineEdit_5.text() + "," + cfg.ui.UX_lineEdit_5.text() + "%20" + cfg.ui.LY_lineEdit_5.text() + "," + cfg.ui.LX_lineEdit_5.text() + "%20" + cfg.ui.LY_lineEdit_5.text() + "," + cfg.ui.LX_lineEdit_5.text() + "%20" + cfg.ui.UY_lineEdit_5.text() + "," + cfg.ui.UX_lineEdit_5.text() + "%20" + cfg.ui.UY_lineEdit_5.text() + ')))%22' + '&rows=' + str(maxResultNum) + '&start=' + str(startR)
-			response = cfg.utls.passwordConnect(user, password, url, topLevelUrl)
+			response = cfg.utls.passwordConnectPython(user, password, url, topLevelUrl)
 			if response == "No":
 				cfg.uiUtls.removeProgressBar()
 				return "No"
 			#info = response.info()
-			xml = response	
+			xml = response.read()
 			tW.setSortingEnabled(False)
 			try:
 				doc = cfg.minidomSCP.parseString(xml)
-			except Exception, err:
+			except Exception as err:
 				# logger
 				cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 				if "HTTP Status 500" in xml:
@@ -626,7 +621,7 @@ class DownloadSentinelImages:
 			for entry in entries:
 				if cfg.actionCheck == "Yes":
 					e = e + 1
-					cfg.uiUtls.updateBar(30 + e * int(70/len(entries)), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
+					cfg.uiUtls.updateBar(30 + e * int(70/len(entries)), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Searching ..."))
 					imgNameTag = entry.getElementsByTagName("title")[0]
 					imgName = imgNameTag.firstChild.data
 					imgIDTag = entry.getElementsByTagName("id")[0]
@@ -662,17 +657,18 @@ class DownloadSentinelImages:
 							cloudcoverpercentage = xd.firstChild.data
 					url2 = topUrl + "/odata/v1/Products('" +imgID  + "')/Nodes('" +imgName + ".SAFE')/Nodes('MTD_MSIL1C.xml')/$value"
 					if cfg.actionCheck == "Yes":
-						response2 = cfg.utls.passwordConnect(user, password, url2, topLevelUrl)
-						if len(response2) == 0 or "Navigation failed" in response2:
+						response2 = cfg.utls.passwordConnectPython(user, password, url2, topLevelUrl)
+						xml2 = response2.read()
+						if len(xml2) == 0:
 							# old xml version
 							url2 = topUrl + "/odata/v1/Products('" +imgID  + "')/Nodes('" +imgName + ".SAFE')/Nodes('" + imgName.replace('_PRD_MSIL1C_', '_MTD_SAFL1C_') + ".xml')/$value"
-							response2 = cfg.utls.passwordConnect(user, password, url2, topLevelUrl)
+							response2 = cfg.utls.passwordConnectPython(user, password, url2, topLevelUrl)
+							xml2 = response2.read()
 						if response2 == "No":
 							cfg.uiUtls.removeProgressBar()
 							return "No"
-						xml2 = response2
 						# logger
-						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " xml downloaded")
+						cfg.utls.logCondition(str(__name__) + "-" + str(cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " thumbnail downloaded" + str(xml2))
 						try:
 							newV = None
 							doc2 = cfg.minidomSCP.parseString(xml2)
@@ -702,7 +698,7 @@ class DownloadSentinelImages:
 										cfg.utls.addTableItem(tW, imgPreview2, c, 11)
 										cfg.utls.addTableItem(tW, imgID, c, 12)
 										newV = "Yes"
-						except Exception, err:
+						except Exception as err:
 							# logger
 							cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 						if newV is None:
@@ -737,7 +733,7 @@ class DownloadSentinelImages:
 												cfg.utls.addTableItem(tW, imgPreview, c, 10)
 												cfg.utls.addTableItem(tW, imgPreview2, c, 11)
 												cfg.utls.addTableItem(tW, imgID, c, 12)
-							except Exception, err:
+							except Exception as err:
 								# logger
 								cfg.utls.logCondition(str(__name__) + "-" + (cfg.inspectSCP.stack()[0][3])+ " " + cfg.utls.lineOfCode(), " ERROR exception: " + str(err))
 		tW.setSortingEnabled(True)		
@@ -749,7 +745,7 @@ class DownloadSentinelImages:
 	# clear table
 	def clearTable(self):
 		# ask for confirm
-		a = cfg.utls.questionBox(cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Reset signature list"), cfg.QtGuiSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the table?"))
+		a = cfg.utls.questionBox(cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Reset signature list"), cfg.QtWidgetsSCP.QApplication.translate("semiautomaticclassificationplugin", "Are you sure you want to clear the table?"))
 		if a == "Yes":
 			tW = cfg.ui.sentinel_images_tableWidget
 			cfg.utls.clearTable(tW)
